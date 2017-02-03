@@ -182,7 +182,7 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 
 	//myLogger.Debug("New owner of [%s] is [% x]", asset, newOwner)
 
-	/myLogger.Debug("Transfer...done")
+	//myLogger.Debug("Transfer...done")
 
 	return nil, nil
 }
@@ -261,7 +261,7 @@ func (t *AssetManagementChaincode) Invoke(stub shim.ChaincodeStubInterface, func
 // "query(asset)": returns the owner of the asset.
 // Anyone can invoke this function.
 func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	myLogger.Debugf("Query [%s]", function)
+	//myLogger.Debugf("Query [%s]", function)
 
 	if function != "query" {
 		return nil, errors.New("Invalid query function name. Expecting 'query' but found '" + function + "'")
@@ -270,14 +270,14 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 	var err error
 
 	if len(args) != 1 {
-		myLogger.Debug("Incorrect number of arguments. Expecting name of an asset to query")
+		//myLogger.Debug("Incorrect number of arguments. Expecting name of an asset to query")
 		return nil, errors.New("Incorrect number of arguments. Expecting name of an asset to query")
 	}
 
 	// Who is the owner of the asset?
 	asset := args[0]
 
-	myLogger.Debugf("Arg [%s]", string(asset))
+	//myLogger.Debugf("Arg [%s]", string(asset))
 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: asset}}
@@ -285,11 +285,11 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 
 	row, err := stub.GetRow("AssetsOwnership", columns)
 	if err != nil {
-		myLogger.Debugf("Failed retriving asset [%s]: [%s]", string(asset), err)
+		//myLogger.Debugf("Failed retriving asset [%s]: [%s]", string(asset), err)
 		return nil, fmt.Errorf("Failed retriving asset [%s]: [%s]", string(asset), err)
 	}
 
-	myLogger.Debugf("Query done [% x]", row.Columns[1].GetBytes())
+	//myLogger.Debugf("Query done [% x]", row.Columns[1].GetBytes())
 
 	return row.Columns[1].GetBytes(), nil
 }
