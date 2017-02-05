@@ -17,27 +17,25 @@ limitations under the License.
 package main
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/core/crypto/primitives"
 )
 
-// AssetManagementChaincode is simple chaincode implementing a basic Asset Management system
+// NumberPortabilityChaincode is simple chaincode implementing a basic Asset Management system
 // with access control enforcement at chaincode level.
 // Look here for more information on how to implement access control at chaincode level:
 // https://github.com/hyperledger/fabric/blob/master/docs/tech/application-ACL.md
 // An asset is simply represented by a string.
 
-type AssetManagementChaincode struct {
+type NumberPortabilityChaincode struct {
 }
 
 // Init method will be called during deployment.
 
 
 
-func (t *AssetManagementChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("Init Chaincode...")
 	if len(args) != 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 0")
@@ -60,7 +58,7 @@ func (t *AssetManagementChaincode) Init(stub shim.ChaincodeStubInterface, functi
 	return nil, nil
 }
 
-func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
 	fmt.Println("In Assign...")
 
@@ -76,14 +74,15 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 
 	// Register assignment
 	fmt.Println("New owner of [%s] is [%s]", mobileNumber, name)
-
-	ok, err = stub.InsertRow("AssetsOwnership", shim.Row{
+    
+	ok, err := stub.InsertRow("AssetsOwnership", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: mobileNumber}},
 			&shim.Column{Value: &shim.Column_String_{String_: name}},
 			&shim.Column{Value: &shim.Column_String_{String_: address}},
 			&shim.Column{Value: &shim.Column_String_{String_: idNumber}},
-	})
+			},
+			})
 
 	if !ok && err == nil {
 		return nil, errors.New("MobileNumber is already assigned.")
@@ -95,7 +94,7 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 }
 
 
-func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
 	fmt.Println("Transfer Begins...")
 
@@ -119,7 +118,7 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 		return nil, fmt.Errorf("Failed retrieving asset [%s]: [%s]", mobileNumber, err)
 	}
 
-	prvOwner := row.Columns[1].GetString()
+	prvOwner := string(row.Columns[1].GetBytes())
 	fmt.Println("Previous owener of [%s] is [%s]", mobileNumber, prvOwner)
 	
 	if len(prvOwner) == 0 {
@@ -162,7 +161,7 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 // Only an administrator can call this function.
 // "transfer(asset, newOwner)": to transfer the ownership of an asset. Only the owner of the specific
 
-func (t *AssetManagementChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
 	// Handle different functions
 	if function == "assign" {
@@ -180,7 +179,7 @@ func (t *AssetManagementChaincode) Invoke(stub shim.ChaincodeStubInterface, func
 // Supported functions are the following:
 // "query(asset)": returns the owner of the asset.
 // Anyone can invoke this function.
-func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("Query [%s]", function)
 
 	if function != "query" {
@@ -208,18 +207,38 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 		fmt.Println("Failed retriving details of [%s]: [%s]", string(mobileNumber), err)
 		return nil, fmt.Errorf("Failed retriving details of [%s]: [%s]", string(mobileNumber), err)
 	}
-   if row == nil {
-		fmt.Println("MobileNumber : [%s] not assigned to anyone ", string(mobileNumber))
+   if len(row.Columns) != 0{
+		fmt.Println("Query done : Owner of the number :: [%s]", string(row.Columns[1].GetBytes()))
+		/*rowDetails := []byte([
+		{string(row.Columns[0].GetBytes())},
+		{string(row.Columns[1].GetBytes())},
+		{string(row.Columns[2].GetBytes())},
+		{string(row.Columns[3].GetBytes())},
+		{string(row.Columns[4].GetBytes())}
+		])*/
+		
+		var rowDetails = []byte(`[
+
+		{string(row.Columns[0].GetBytes())},
+        {string(row.Columns[1].GetBytes())},
+		{string(row.Columns[2].GetBytes())},
+		{string(row.Columns[3].GetBytes())},
+		{string(row.Columns[4].GetBytes())}
+
+	     ]`)
+		return rowDetails, nil
+		
+		
+		}else{
+	    fmt.Println("MobileNumber : [%s] not assigned to anyone ", string(mobileNumber))
 		return nil, fmt.Errorf("MobileNumber : [%s] not assigned to anyone ", string(mobileNumber))
 	}
-	fmt.Println("Query done : Owner of the number :: [%s]", row.Columns[1].GetString()))
-
-	return row.Columns[], nil
+	
 }
 
 func main() {
-	err := shim.Start(new(AssetManagementChaincode))
+	err := shim.Start(new(NumberPortabilityChaincode))
 	if err != nil {
-		fmt.Println("Error starting AssetManagementChaincode: %s", err)
+		fmt.Println("Error starting NumberPortabilityChaincode: %s", err)
 	}
 }
