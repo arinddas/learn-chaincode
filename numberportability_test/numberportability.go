@@ -162,15 +162,17 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
     
 	
 	
-	rowString := fmt.Sprintf("%s", row)
+	
 	
 	
 	
 	if len(row.Columns) == 0{
-		return nil, fmt.Errorf("Invalid row. Nil")
+		return nil, fmt.Errorf("Cannot transfer non-assigned asset")
 	}
-	
+	rowString := fmt.Sprintf("%s", row)
 	fmt.Println("Before Transfer Query done : Details :: %s", rowString)
+	
+	
 
 	err = stub.DeleteRow(
 		"AssetsOwnership",
