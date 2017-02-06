@@ -42,13 +42,30 @@ func (t *NumberPortabilityChaincode) Init(stub shim.ChaincodeStubInterface, func
 	}
 
 	// Create ownership table
-	err := stub.CreateTable("AssetsOwnership", []*shim.ColumnDefinition{
+	/*err := stub.CreateTable("AssetsOwnership", []*shim.ColumnDefinition{
 		&shim.ColumnDefinition{Name: "mobileNumber", Type: shim.ColumnDefinition_STRING, Key: true},
 		&shim.ColumnDefinition{Name: "name", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "address", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "idNumber", Type: shim.ColumnDefinition_STRING, Key: false},
 		
-	})
+	})*/
+	
+	
+	
+	
+	var columnDefsTableOne []*shim.ColumnDefinition
+	columnOneTableOneDef := shim.ColumnDefinition{Name: "mobileNumber",Type: shim.ColumnDefinition_STRING, Key: true}
+	columnTwoTableOneDef := shim.ColumnDefinition{Name: "name",Type: shim.ColumnDefinition_STRING, Key: false}
+	columnThreeTableOneDef := shim.ColumnDefinition{Name: "address",Type: shim.ColumnDefinition_STRING, Key: false}
+	columnFourTableOneDef := shim.ColumnDefinition{Name: "idNumber",Type: shim.ColumnDefinition_STRING, Key: false}
+	columnDefsTableOne = append(columnDefsTableOne, &columnOneTableOneDef)
+	columnDefsTableOne = append(columnDefsTableOne, &columnTwoTableOneDef)
+	columnDefsTableOne = append(columnDefsTableOne, &columnThreeTableOneDef)
+	columnDefsTableOne = append(columnDefsTableOne, &columnFourTableOneDef)
+	err := stub.CreateTable("AssetsOwnership", columnDefsTableOne)
+	
+	
+	
 	if err != nil {
 		return nil, errors.New("Failed creating AssetsOwnership table.")
 	}
@@ -73,22 +90,44 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 	
 
 	// Register assignment
-	fmt.Println("New owner of [%s] is [%s]", mobileNumber, name)
+	fmt.Println("New owner of %s is %s", mobileNumber, name)
     
-	ok, err := stub.InsertRow("AssetsOwnership", shim.Row{
+	/*ok, err := stub.InsertRow("AssetsOwnership", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: mobileNumber}},
 			&shim.Column{Value: &shim.Column_String_{String_: name}},
 			&shim.Column{Value: &shim.Column_String_{String_: address}},
 			&shim.Column{Value: &shim.Column_String_{String_: idNumber}},
 			},
-			})
+			})*/
+			
+			
+			
+			
+			
+	    var columns []*shim.Column
+		col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
+		col2 := shim.Column{Value: &shim.Column_String_{String_: name}}
+		col3 := shim.Column{Value: &shim.Column_String_{String_: address}}
+		col4 := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
+		columns = append(columns, &col1)
+		columns = append(columns, &col2)
+		columns = append(columns, &col3)
+		columns = append(columns, &col4)
+		
+         fmt.Println(columns)
 
-	if !ok && err == nil {
-		return nil, errors.New("MobileNumber is already assigned.")
-	}
+		row := shim.Row{Columns: columns}
+		ok, err := stub.InsertRow("AssetsOwnership", row)
+		if err != nil {
+			return nil, fmt.Errorf("insert Record operation failed. %s", err)
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+			
 
-	fmt.Println("Assign...done!")
+     	fmt.Println("Assign...done!")
 
 	return nil, err
 }
@@ -108,6 +147,9 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
 	address := args[2]
 	idNumber := args[3]
 	
+	
+	
+	
 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
@@ -115,14 +157,18 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
 
 	row, err := stub.GetRow("AssetsOwnership", columns)
 	if err != nil {
-		return nil, fmt.Errorf("Failed retrieving asset [%s]: [%s]", mobileNumber, err)
+		return nil, fmt.Errorf("Failed retrieving asset %s: %s", mobileNumber, err)
 	}
-
-	prvOwner := string(row.Columns[1].GetBytes())
-	fmt.Println("Previous owener of [%s] is [%s]", mobileNumber, prvOwner)
+    
 	
-	if len(prvOwner) == 0 {
-		return nil, fmt.Errorf("Invalid previous owner. Nil")
+	
+		rowString := fmt.Sprintf("%s", row)
+		return []byte(rowString), nil
+	
+	
+	
+	if len(rowString) == 0 {
+		return nil, fmt.Errorf("Invalid row. Nil")
 	}
 
 	err = stub.DeleteRow(
@@ -147,7 +193,7 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
 		return nil, errors.New("Failed inserting row.")
 	}
 
-	fmt.Println("New owner of [%s] is [%s]", mobileNumber, name)
+	fmt.Println("New owner of %s is %s", mobileNumber, name)
 
 	fmt.Println("Transfer...done")
 
@@ -180,7 +226,7 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 // "query(asset)": returns the owner of the asset.
 // Anyone can invoke this function.
 func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Println("Query [%s]", function)
+	fmt.Println("Query %s", function)
 
 	if function != "query" {
 		return nil, errors.New("Invalid query function name. Expecting 'query' but found '" + function + "'")
@@ -195,8 +241,9 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 
 	// Who is the owner of the asset?
 	mobileNumber := args[0]
-
-	fmt.Println("Arg [%s]", string(mobileNumber))
+	fmt.Println("Arg %s", string(mobileNumber))
+	
+	
 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
@@ -204,11 +251,15 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 
 	row, err := stub.GetRow("AssetsOwnership", columns)
 	if err != nil {
-		fmt.Println("Failed retriving details of [%s]: [%s]", string(mobileNumber), err)
-		return nil, fmt.Errorf("Failed retriving details of [%s]: [%s]", string(mobileNumber), err)
+		fmt.Println("Failed retriving details of %s: %s", string(mobileNumber), err)
+		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(mobileNumber), err)
 	}
+	
+	
+	
+	
    if len(row.Columns) != 0{
-		fmt.Println("Query done : Owner of the number :: [%s]", string(row.Columns[1].GetBytes()))
+		
 		/*rowDetails := []byte([
 		{string(row.Columns[0].GetBytes())},
 		{string(row.Columns[1].GetBytes())},
@@ -217,21 +268,15 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 		{string(row.Columns[4].GetBytes())}
 		])*/
 		
-		var rowDetails = []byte(`[
-
-		{string(row.Columns[0].GetBytes())},
-        {string(row.Columns[1].GetBytes())},
-		{string(row.Columns[2].GetBytes())},
-		{string(row.Columns[3].GetBytes())},
-		{string(row.Columns[4].GetBytes())}
-
-	     ]`)
-		return rowDetails, nil
 		
+		
+		rowString := fmt.Sprintf("%s", row)
+		fmt.Println("Query done : Details :: %s", rowString)
+		return []byte(rowString), nil		
 		
 		}else{
-	    fmt.Println("MobileNumber : [%s] not assigned to anyone ", string(mobileNumber))
-		return nil, fmt.Errorf("MobileNumber : [%s] not assigned to anyone ", string(mobileNumber))
+	    fmt.Println("MobileNumber : %s not assigned to anyone ", string(mobileNumber))
+		return nil, fmt.Errorf("MobileNumber : %s not assigned to anyone ", string(mobileNumber))
 	}
 	
 }
