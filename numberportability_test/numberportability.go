@@ -162,14 +162,15 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
     
 	
 	
-		rowString := fmt.Sprintf("%s", row)
-		return []byte(rowString), nil
+	rowString := fmt.Sprintf("%s", row)
 	
 	
 	
 	if len(rowString) == 0 {
 		return nil, fmt.Errorf("Invalid row. Nil")
 	}
+	
+	fmt.Println("Before Transfer Query done : Details :: %s", rowString)
 
 	err = stub.DeleteRow(
 		"AssetsOwnership",
@@ -178,21 +179,33 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
 	if err != nil {
 		return nil, errors.New("Failed deleting row.")
 	}
+	
+	
+	
 
-	_, err = stub.InsertRow(
-		"AssetsOwnership",
-		shim.Row{
-			Columns: []*shim.Column{
-				&shim.Column{Value: &shim.Column_String_{String_: mobileNumber}},
-				&shim.Column{Value: &shim.Column_String_{String_: name}},
-			    &shim.Column{Value: &shim.Column_String_{String_: address}},
-			    &shim.Column{Value: &shim.Column_String_{String_: idNumber}},
-			},
-		})
-	if err != nil {
-		return nil, errors.New("Failed inserting row.")
-	}
+	    var columnsNew []*shim.Column
+		col1New := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
+		col2New := shim.Column{Value: &shim.Column_String_{String_: name}}
+		col3New := shim.Column{Value: &shim.Column_String_{String_: address}}
+		col4New := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
+		columnsNew = append(columnsNew, &col1New)
+		columnsNew = append(columnsNew, &col2New)
+		columnsNew = append(columnsNew, &col3New)
+		columnsNew = append(columnsNew, &col4New)
+		
+        fmt.Println("After Transfer")
+		fmt.Println(columnsNew)
 
+		rowNew := shim.Row{Columns: columnsNew}
+		ok, errNew := stub.InsertRow("AssetsOwnership", rowNew)
+		if errNew != nil {
+			return nil, fmt.Errorf("insert Record operation failed. %s", errNew)
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+		
+		
 	fmt.Println("New owner of %s is %s", mobileNumber, name)
 
 	fmt.Println("Transfer...done")
@@ -271,7 +284,7 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 		
 		
 		rowString := fmt.Sprintf("%s", row)
-		fmt.Println("Query done : Details :: %s", rowString)
+		fmt.Println("Query Done : Details :: %s", rowString)
 		return []byte(rowString), nil		
 		
 		}else{
