@@ -166,7 +166,7 @@ func (t *NumberPortabilityChaincode) transfer(stub shim.ChaincodeStubInterface, 
 	
 	
 	
-	if len(rowString) == 0 {
+	if len(row.Columns) == 0{
 		return nil, fmt.Errorf("Invalid row. Nil")
 	}
 	
