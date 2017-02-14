@@ -82,7 +82,8 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
-
+	
+	
 	mobileNumber := args[0]
 	name := args[1]
 	address := args[2]
@@ -111,11 +112,27 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 		col3 := shim.Column{Value: &shim.Column_String_{String_: address}}
 		col4 := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
 		columns = append(columns, &col1)
+		
+		row, err := stub.GetRow("AssetsOwnership", columns)
+			if err != nil {
+				fmt.Println("Failed retriving details of %s: %s", string(mobileNumber), err)
+				return nil, fmt.Errorf("Failed retriving details of %s: %s", string(mobileNumber), err)
+			}
+			
+			
+			if len(row.Columns) != 0{
+					fmt.Println("MobileNumber : %s not assigned to anyone ", string(mobileNumber))
+					return nil, fmt.Errorf("MobileNumber : %s is already assigned.", string(mobileNumber))
+		        }
+
+		
+		
 		columns = append(columns, &col2)
 		columns = append(columns, &col3)
 		columns = append(columns, &col4)
 		
-         fmt.Println(columns)
+		
+		fmt.Println(columns)
 
 		row := shim.Row{Columns: columns}
 		ok, err := stub.InsertRow("AssetsOwnership", row)
