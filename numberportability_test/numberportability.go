@@ -120,7 +120,7 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 		row := shim.Row{Columns: columns}
 		ok, err := stub.InsertRow("AssetsOwnership", row)
 		if err != nil {
-			return nil, fmt.Errorf("insert Record operation failed. %s", err)
+			return nil, errors.New("MobileNumber is already assigned.")
 		}
 		if !ok {
 			return nil, errors.New("MobileNumber is already assigned.")
