@@ -123,7 +123,7 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 			
 			
 			if len(row.Columns) != 0{
-					fmt.Println("MobileNumber : %s not assigned to anyone ", string(mobileNumber))
+					fmt.Println("MobileNumber : %s is already assigned.", string(mobileNumber))
 					return nil, fmt.Errorf("MobileNumber : %s is already assigned.", string(mobileNumber))
 		        }
 
@@ -246,10 +246,26 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 	// Handle different functions
 	if function == "assign" {
 		// Assign ownership
-		return t.assign(stub, args)
+		
+		ok,err :=  t.assign(stub, args)
+        if err != nil{
+		   return nil, err
+		   
+		}else{
+		     return ok, nil
+		}		
+		//return t.assign(stub, args)
 	} else if function == "transfer" {
 		// Transfer ownership
-		return t.transfer(stub, args)
+		
+		ok,err :=  t.transfer(stub, args)
+        if err != nil{
+		   return nil, err
+		   
+		}else{
+		     return ok, nil
+		}	
+		//return t.transfer(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
