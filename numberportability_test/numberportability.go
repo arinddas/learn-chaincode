@@ -107,13 +107,15 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 			
 			
 	    var columns []*shim.Column
+		var columns1 []shim.Column
 		col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
 		col2 := shim.Column{Value: &shim.Column_String_{String_: name}}
 		col3 := shim.Column{Value: &shim.Column_String_{String_: address}}
 		col4 := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
-		columns = append(columns, &col1)
 		
-		row, err := stub.GetRow("AssetsOwnership", columns)
+		columns1 = append(columns1, col1)
+		
+		row, err := stub.GetRow("AssetsOwnership", columns1)
 			if err != nil {
 				fmt.Println("Failed retriving details of %s: %s", string(mobileNumber), err)
 				return nil, fmt.Errorf("Failed retriving details of %s: %s", string(mobileNumber), err)
@@ -126,7 +128,7 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 		        }
 
 		
-		
+		columns = append(columns, &col1)
 		columns = append(columns, &col2)
 		columns = append(columns, &col3)
 		columns = append(columns, &col4)
@@ -134,8 +136,8 @@ func (t *NumberPortabilityChaincode) assign(stub shim.ChaincodeStubInterface, ar
 		
 		fmt.Println(columns)
 
-		row := shim.Row{Columns: columns}
-		ok, err := stub.InsertRow("AssetsOwnership", row)
+		rowIn := shim.Row{Columns: columns}
+		ok, err := stub.InsertRow("AssetsOwnership", rowIn)
 		if err != nil {
 			return nil, errors.New("MobileNumber is already assigned.")
 		}
