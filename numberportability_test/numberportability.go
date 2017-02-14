@@ -245,26 +245,160 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 
 	// Handle different functions
 	if function == "assign" {
-		// Assign ownership
+		fmt.Println("In Assign...")
+
+	if len(args) != 4 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 4")
+	}
+	
+	
+	mobileNumber := args[0]
+	name := args[1]
+	address := args[2]
+	idNumber := args[3]
+	
+
+	// Register assignment
+	fmt.Println("New owner of %s is %s", mobileNumber, name)
+    
+	/*ok, err := stub.InsertRow("AssetsOwnership", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: mobileNumber}},
+			&shim.Column{Value: &shim.Column_String_{String_: name}},
+			&shim.Column{Value: &shim.Column_String_{String_: address}},
+			&shim.Column{Value: &shim.Column_String_{String_: idNumber}},
+			},
+			})*/
+			
+			
+			
+			
+			
+	    var columns []*shim.Column
+		var columns1 []shim.Column
+		col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
+		col2 := shim.Column{Value: &shim.Column_String_{String_: name}}
+		col3 := shim.Column{Value: &shim.Column_String_{String_: address}}
+		col4 := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
 		
-		ok,err :=  t.assign(stub, args)
-        if err != nil{
-		   return nil, err
-		   
-		}else{
-		     return ok, nil
-		}		
+		columns1 = append(columns1, col1)
+		
+		row, err := stub.GetRow("AssetsOwnership", columns1)
+			if err != nil {
+				fmt.Println("Failed retriving details of %s: %s", string(mobileNumber), err)
+				return nil, fmt.Errorf("Failed retriving details of %s: %s", string(mobileNumber), err)
+			}
+			
+			
+			if len(row.Columns) != 0{
+					fmt.Println("MobileNumber : %s is already assigned.", string(mobileNumber))
+					return nil, fmt.Errorf("MobileNumber : %s is already assigned.", string(mobileNumber))
+		        }
+
+		
+		columns = append(columns, &col1)
+		columns = append(columns, &col2)
+		columns = append(columns, &col3)
+		columns = append(columns, &col4)
+		
+		
+		fmt.Println(columns)
+
+		rowIn := shim.Row{Columns: columns}
+		ok, err := stub.InsertRow("AssetsOwnership", rowIn)
+		if err != nil {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+			
+
+     	fmt.Println("Assign...done!")
+
+	return nil, err
 		//return t.assign(stub, args)
 	} else if function == "transfer" {
 		// Transfer ownership
+		fmt.Println("Transfer Begins...")
+
+	if len(args) != 4 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 4")
+	}
+
+
+	mobileNumber := args[0]
+	name := args[1]
+	address := args[2]
+	idNumber := args[3]
+	
+	
+	
+	
+
+	var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
+	columns = append(columns, col1)
+
+	row, err := stub.GetRow("AssetsOwnership", columns)
+	if err != nil {
+		return nil, fmt.Errorf("Failed retrieving asset %s: %s", mobileNumber, err)
+	}
+    
+	
+	
+	
+	
+	
+	
+	if len(row.Columns) == 0{
+		return nil, fmt.Errorf("Cannot transfer non-assigned asset")
+	}
+	rowString := fmt.Sprintf("%s", row)
+	fmt.Println("Before Transfer Query done : Details :: %s", rowString)
+	
+	
+
+	err = stub.DeleteRow(
+		"AssetsOwnership",
+		[]shim.Column{shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}},
+	)
+	if err != nil {
+		return nil, errors.New("Failed deleting row.")
+	}
+	
+	
+	
+
+	    var columnsNew []*shim.Column
+		col1New := shim.Column{Value: &shim.Column_String_{String_: mobileNumber}}
+		col2New := shim.Column{Value: &shim.Column_String_{String_: name}}
+		col3New := shim.Column{Value: &shim.Column_String_{String_: address}}
+		col4New := shim.Column{Value: &shim.Column_String_{String_: idNumber}}
+		columnsNew = append(columnsNew, &col1New)
+		columnsNew = append(columnsNew, &col2New)
+		columnsNew = append(columnsNew, &col3New)
+		columnsNew = append(columnsNew, &col4New)
 		
-		ok,err :=  t.transfer(stub, args)
-        if err != nil{
-		   return nil, err
-		   
-		}else{
-		     return ok, nil
-		}	
+        fmt.Println("After Transfer")
+		fmt.Println(columnsNew)
+
+		rowNew := shim.Row{Columns: columnsNew}
+		ok, errNew := stub.InsertRow("AssetsOwnership", rowNew)
+		if errNew != nil {
+			return nil, fmt.Errorf("insert Record operation failed. %s", errNew)
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+		
+		
+	fmt.Println("New owner of %s is %s", mobileNumber, name)
+
+	fmt.Println("Transfer...done")
+
+	return nil, nil
+		
 		//return t.transfer(stub, args)
 	}
 
