@@ -188,7 +188,7 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 		}	
 
        if Plan == "PlanB"{
-		    PlanNew := "PlanA"
+		    Plan := "PlanA"
 			ServiceValidity = ServiceValidity - (ServiceValidity/6)
 			TalktimeBalance = TalktimeBalance - (TalktimeBalance/6)
 			SMSbalance = SMSbalance - (SMSbalance/6)
@@ -213,7 +213,7 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 		 
        key = Number+ServiceProviderNew
 		
-            CSPServiceDetailsStructObjAcceptor := CSPServiceDetails{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: PlanNew, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
+            CSPServiceDetailsStructObjAcceptor := CSPServiceDetails{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
             fmt.Println("Acceptor Service Deatils Structure %s",CSPServiceDetailsStructObjAcceptor)
 			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",CSPServiceDetailsStructObjAcceptor)))
 			if err != nil {
