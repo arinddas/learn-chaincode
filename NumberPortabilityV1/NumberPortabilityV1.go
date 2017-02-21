@@ -146,22 +146,22 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 		ServiceProviderNew := args[2]
 		Plan := args[3]
 		
-	    ServiceValidity, err = strconv.Atoi("args[4]")
+	    ServiceValidity, err = strconv.Atoi(args[4])
 		if err != nil {
 		return nil, err
 	    }
 		
-	    TalktimeBalance, err = strconv.Atoi("args[5]")
+	    TalktimeBalance, err = strconv.Atoi(args[5])
 		if err != nil {
 		return nil, err
 	    }
 		
-		SMSbalance, err = strconv.Atoi("args[6]")
+		SMSbalance, err = strconv.Atoi(args[6])
 		if err != nil {
 		return nil, err
 	    }
 		
-		DataBalance, err = strconv.Atoi("args[7]")
+		DataBalance, err = strconv.Atoi(args[7])
 		if err != nil {
 		return nil, err
 	    }
