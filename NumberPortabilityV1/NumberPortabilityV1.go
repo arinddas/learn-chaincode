@@ -188,7 +188,7 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 		}	
 
        if Plan == "PlanB"{
-		    Plan := "PlanA"
+		    Plan = "PlanA"
 			ServiceValidity = ServiceValidity - (ServiceValidity/6)
 			TalktimeBalance = TalktimeBalance - (TalktimeBalance/6)
 			SMSbalance = SMSbalance - (SMSbalance/6)
