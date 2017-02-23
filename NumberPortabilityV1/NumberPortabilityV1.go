@@ -361,12 +361,12 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 
 	
 	// Handle different functions
-	if function == "EligibilityConfirm " {
+	if function == "EligibilityConfirm" {
 		return t.EligibilityConfirm (stub, args)
 	} else if function == "UsageDetailsFromDonorCSP" {
 		return t.UsageDetailsFromDonorCSP(stub, args)
 	} else{
-	    return nil, errors.New("Invalid function name. Expecting 'EligibilityConfirm ' or 'CSPServiceDetails' but found '" + function + "'")
+	    return nil, errors.New("Invalid function name. Expecting 'EligibilityConfirm' or 'CSPServiceDetails' but found '" + function + "'")
 	}
 	
 	
