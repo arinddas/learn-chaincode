@@ -184,7 +184,7 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
    
 }
 
-// in args this will take two values - number and OldCSP (DonorCSP) and newCSP
+// in args this will take three values - number and OldCSP (DonorCSP) and newCSP
 func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.ChaincodeStubInterface, argsOld []string) ([]byte, error) {
       
         if len(argsOld) != 3 {
@@ -217,7 +217,6 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 	   
 	    
 	    Number := args[0]
-		ServiceProvider := args[1]
 		Plan := args[2]
 		
 	    ServiceValidity, err = strconv.Atoi(args[3])
