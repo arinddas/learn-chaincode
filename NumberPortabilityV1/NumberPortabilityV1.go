@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"strings"
 )
 
 // NumberPortabilityChaincode is simple chaincode implementing logging to Blockchain
@@ -29,7 +30,7 @@ import (
 type NumberPortabilityChaincode struct {
 }
 
-type CGTADetails struct {
+type EligibilityConfirm struct {
 
 		Number string
 		ServiceProvider string
@@ -39,7 +40,46 @@ type CGTADetails struct {
 }
 
 
-type FinalPortInfo struct {
+type UserAcceptance struct {
+
+		Number string
+		ServiceProviderOld string
+		PlanOld string 
+	    ServiceValidityOld string
+	    TalktimeBalanceOld string
+		SMSbalanceOld string
+		DataBalanceOld string
+		ServiceProviderNew string
+		PlanNew string 
+	    ServiceValidityNew string
+	    TalktimeBalanceNew string
+		SMSbalanceNew string
+		DataBalanceNew string
+		CustomerAcceptance string
+		
+}
+
+
+type UsageDetailsFromDonorandAcceptorCSP struct {
+
+		Number string
+		ServiceProviderOld string
+		PlanOld string 
+	    ServiceValidityOld string
+	    TalktimeBalanceOld string
+		SMSbalanceOld string
+		DataBalanceOld string
+		ServiceProviderNew string
+		PlanNew string 
+	    ServiceValidityNew string
+	    TalktimeBalanceNew string
+		SMSbalanceNew string
+		DataBalanceNew string
+		
+}
+
+
+type UsageDetailsFromCSP struct {
 
 		Number string
 		ServiceProvider string
@@ -48,22 +88,8 @@ type FinalPortInfo struct {
 	    TalktimeBalance string
 		SMSbalance string
 		DataBalance string
-		CustomerAcceptance string
-		
 }
 
-
-type CSPServiceDetails struct {
-
-		Number string
-		ServiceProviderOld string
-		ServiceProviderNew string
-		Plan string 
-	    ServiceValidity string
-	    TalktimeBalance string
-		SMSbalance string
-		DataBalance string
-}
 
 // Init method will be called during deployment.
 
@@ -83,10 +109,12 @@ func (t *NumberPortabilityChaincode) Init(stub shim.ChaincodeStubInterface, func
 
 // CGTA invoke function
 
-func (t *NumberPortabilityChaincode) CGTAInformation(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
-    fmt.Println("CGTA Information invoke Begins...")
-
+    fmt.Println("EligibilityConfirm  Information invoke Begins...")
+	
+     //VP0
+	
 	if len(args) != 5 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 5")
 	}
@@ -95,33 +123,33 @@ func (t *NumberPortabilityChaincode) CGTAInformation(stub shim.ChaincodeStubInte
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("CGTA Information invoke ends...")
+	fmt.Println("EligibilityConfirm  Information invoke ends...")
 	return nil, nil 
 }
 
 
 
-// FinalPortInfo Invoke function
+// UserAcceptance Invoke function
 
-func (t *NumberPortabilityChaincode) FinalPortInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
-    fmt.Println("FinalPortInfo Information invoke Begins...")
+    fmt.Println("UserAcceptance Information invoke Begins...")
 
-	if len(args) != 8 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 8")
+	if len(args) != 14 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 14")
 	}
 
-	// Check the Customer Acceptance paramater, if true then update world state with new CSP value
+	// Check the User Acceptance paramater, if true then update world state with new CSP value
 	
-	Acceptance := args[7]
+	Acceptance := args[13]
 	if(Acceptance == "true"){
-	err := stub.PutState(args[0],[]byte(args[1]))
+	err := stub.PutState(args[0],[]byte(args[7]))
 	if err != nil {
 		return nil, err
 	}
 	}
 	
-	fmt.Println("FinalPortInfo Information invoke ends...")
+	fmt.Println("UserAcceptance Information invoke ends...")
 	return nil, nil
 }
 
@@ -129,53 +157,90 @@ func (t *NumberPortabilityChaincode) FinalPortInfo(stub shim.ChaincodeStubInterf
 
 // FinalPortInfo Invoke function
 
-func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
-    fmt.Println("CSPServiceDetails Information invoke Begins...")
+    fmt.Println("UsageDetailsFromDonorCSP Information invoke Begins...")
 
 
-	if len(args) != 8 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 8")
+	if len(args) != 7 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 7")
 	}
 	
 	    var err error
-		var ServiceValidity,TalktimeBalance,SMSbalance,DataBalance int
-	    
-	    Number := args[0]
-		ServiceProviderOld := args[1]
-		ServiceProviderNew := args[2]
-		Plan := args[3]
 		
-	    ServiceValidity, err = strconv.Atoi(args[4])
-		if err != nil {
-		return nil, err
-	    }
+		key := args[0]+args[1]
 		
-	    TalktimeBalance, err = strconv.Atoi(args[5])
-		if err != nil {
-		return nil, err
-	    }
-		
-		SMSbalance, err = strconv.Atoi(args[6])
-		if err != nil {
-		return nil, err
-	    }
-		
-		DataBalance, err = strconv.Atoi(args[7])
-		if err != nil {
-		return nil, err
-	    }
-		
-		
-		
-		key := Number+ServiceProviderOld
-		
-            CSPServiceDetailsStructObjDonor := CSPServiceDetails{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2],  Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7]}
-			fmt.Println("Donor Service Deatils Structure %s",CSPServiceDetailsStructObjDonor)
-			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",CSPServiceDetailsStructObjDonor)))
+            UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: args[1], Plan: args[2], ServiceValidity: args[3], TalktimeBalance: args[4], SMSbalance: args[5], DataBalance: args[6]}
+			fmt.Println("Donor Service Details Structure ",UsageDetailsFromDonorCSPObj)
+			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorCSPObj)))
 			if err != nil {
 				return nil, err
 			}
+			
+	
+		fmt.Println("UsageDetailsFromDonorCSP Information invoke ends...")
+		return nil, nil
+		
+   
+}
+
+// in args this will take two values - number and OldCSP (DonorCSP)
+func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.ChaincodeStubInterface, argsOld []string) ([]byte, error) {
+      
+        if len(argsOld) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+	    }
+		
+		var ServiceValidity,TalktimeBalance,SMSbalance,DataBalance int
+		
+	
+		key := argsOld[0]+argsOld[1]
+		valAsbytes, err := stub.GetState(key)
+		if err != nil {
+			jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
+			return nil, errors.New(jsonResp)
+		} else if len(valAsbytes) == 0{
+			jsonResp := "{\"Error\":\"Failed to get Query for " + key + "\"}"
+			return nil, errors.New(jsonResp)
+		}
+		
+		donorDetails := fmt.Sprintf("%s", valAsbytes)
+		
+		donorDetails = strings.Trim(donorDetails,"{")
+		donorDetails = strings.Trim(donorDetails,"}")
+		donorDetails = strings.Trim(donorDetails,"[")
+		donorDetails = strings.Trim(donorDetails,"]")
+		
+		args := strings.Split(donorDetails, " ")
+		
+	    fmt.Println("Donor Service Details Structure",args)
+	   
+	    
+	    Number := args[0]
+		ServiceProvider := args[1]
+		Plan := args[2]
+		
+	    ServiceValidity, err = strconv.Atoi(args[3])
+		if err != nil {
+		return nil, err
+	    }
+		
+	    TalktimeBalance, err = strconv.Atoi(args[4])
+		if err != nil {
+		return nil, err
+	    }
+		
+		SMSbalance, err = strconv.Atoi(args[5])
+		if err != nil {
+		return nil, err
+	    }
+		
+		DataBalance, err = strconv.Atoi(args[6])
+		if err != nil {
+		return nil, err
+	    }
+		
+		
 			
 		// Calculate Acceptor Service
 		
@@ -187,7 +252,7 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 			DataBalance = DataBalance - (DataBalance/5)
 		}	
 
-       if Plan == "PlanB"{
+        if Plan == "PlanB"{
 		    Plan = "PlanA"
 			ServiceValidity = ServiceValidity - (ServiceValidity/6)
 			TalktimeBalance = TalktimeBalance - (TalktimeBalance/6)
@@ -195,7 +260,7 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
 			DataBalance = DataBalance - (DataBalance/6)
 		}
 		
-       if Plan == "PlanC"{
+        if Plan == "PlanC"{
 		    Plan = "PlanB"
 			ServiceValidity = ServiceValidity - (ServiceValidity/4)
 			TalktimeBalance = TalktimeBalance - (TalktimeBalance/4)
@@ -208,26 +273,83 @@ func (t *NumberPortabilityChaincode) CSPServiceDetails(stub shim.ChaincodeStubIn
          SMSbalanceNew := strconv.Itoa(SMSbalance)
          DataBalanceNew := strconv.Itoa(DataBalance)
 		 
+		 
 		 // Put the state of Acceptor
 		 
 		 
-       key = Number+ServiceProviderNew
+        key = Number+ServiceProvider
 		
-            CSPServiceDetailsStructObjAcceptor := CSPServiceDetails{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
-            fmt.Println("Acceptor Service Deatils Structure %s",CSPServiceDetailsStructObjAcceptor)
-			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",CSPServiceDetailsStructObjAcceptor)))
+            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: args[1], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
+			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
+			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromAcceptorCSPObj)))
 			if err != nil {
 				return nil, err
 			}
+		
 	
-	fmt.Println("CSPServiceDetails Information invoke ends...")
-	return nil, nil
+	    valAsbytesNew, errNew := stub.GetState(key)
+		if errNew != nil {
+			jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
+			return nil, errors.New(jsonResp)
+		} else if len(valAsbytes) == 0{
+			jsonResp := "{\"Error\":\"Failed to get Query for " + key + "\"}"
+			return nil, errors.New(jsonResp)
+		}
+		
+		
+		acceptorDetails := fmt.Sprintf("%s", valAsbytesNew)
+		
+		acceptorDetails = strings.Trim(acceptorDetails,"{")
+		acceptorDetails = strings.Trim(acceptorDetails,"}")
+		acceptorDetails = strings.Trim(acceptorDetails,"[")
+		acceptorDetails = strings.Trim(acceptorDetails,"]")
+		
+		argsNew := strings.Split(acceptorDetails, " ")
+		
+		fmt.Println("Acceptor Service Details Structure",argsNew)
+		
+		
+		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: argsNew[1], PlanNew: argsNew[2], ServiceValidityNew: argsNew[3], TalktimeBalanceNew: argsNew[4], SMSbalanceNew: argsNew[5], DataBalanceNew: argsNew[6]}
+        
+		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
+		// put the value for Regulator Query in future
+		key = args[0]+args[1]+argsNew[1]
+		err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorandAcceptorCSPObj)))
+			if err != nil {
+				return nil, err
+			}
+			
+			
+		fmt.Println("Query EntitlementFromRecipientCSP Chaincode... end") 
+		return []byte(fmt.Sprintf("%s",UsageDetailsFromDonorandAcceptorCSPObj)), nil
 	
-   
+	
+
 }
 
 
+func (t *NumberPortabilityChaincode) RegulatorQuery(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+    var key, jsonResp string
+    var err error
 
+    if len(args) != 1 {
+        return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
+    }
+
+    key = args[0]
+    valAsbytes, err := stub.GetState(key)
+    if err != nil {
+        jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
+        return nil, errors.New(jsonResp)
+    } else if len(valAsbytes) == 0{
+	    jsonResp = "{\"Error\":\"Failed to get Query for " + key + "\"}"
+        return nil, errors.New(jsonResp)
+	}
+
+	fmt.Println("Query NumberPoratbility Chaincode... end") 
+    return valAsbytes, nil 
+
+}
 
 
 
@@ -239,14 +361,12 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 
 	
 	// Handle different functions
-	if function == "CGTAInformation" {
-		return t.CGTAInformation(stub, args)
-	} else if function == "CSPServiceDetails" {
-		return t.CSPServiceDetails(stub, args)
-	} else if function == "FinalPortInfo" {
-		return t.FinalPortInfo(stub, args)
-	}else{
-	    return nil, errors.New("Invalid function name. Expecting 'CGTAInformation' or 'CSPServiceDetails' but found '" + function + "'")
+	if function == "EligibilityConfirm " {
+		return t.EligibilityConfirm (stub, args)
+	} else if function == "UsageDetailsFromDonorCSP" {
+		return t.UsageDetailsFromDonorCSP(stub, args)
+	} else{
+	    return nil, errors.New("Invalid function name. Expecting 'EligibilityConfirm ' or 'CSPServiceDetails' but found '" + function + "'")
 	}
 	
 	
@@ -263,9 +383,16 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("Query NumberPortability Chaincode... start") 
 
-	if function != "QueryCSPDetails" {
-		return nil, errors.New("Invalid query function name. Expecting 'query' but found '" + function + "'")
-	}
+	
+	if function == "EntitlementFromRecipientCSP" {
+		return t.EntitlementFromRecipientCSP(stub, args)
+	} 
+	
+	if function == "RegulatorQuery" {
+		return t.RegulatorQuery(stub, args)
+	} 
+	
+	// else We can query WorldState to fetch value
 	
 	var key, jsonResp string
     var err error
@@ -285,9 +412,7 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 	}
 
 	fmt.Println("Query NumberPoratbility Chaincode... end") 
-    return valAsbytes, nil
-	
-    
+    return valAsbytes, nil 
   
 	
 }
