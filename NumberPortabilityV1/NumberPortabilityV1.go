@@ -184,11 +184,11 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
    
 }
 
-// in args this will take two values - number and OldCSP (DonorCSP)
+// in args this will take two values - number and OldCSP (DonorCSP) and newCSP
 func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.ChaincodeStubInterface, argsOld []string) ([]byte, error) {
       
-        if len(argsOld) != 2 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 2")
+        if len(argsOld) != 3 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 3")
 	    }
 		
 		var ServiceValidity,TalktimeBalance,SMSbalance,DataBalance int
@@ -276,10 +276,10 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 
 		 // Put the state of Acceptor
 		 
-		 
-        key = Number+ServiceProvider
+		// number + newCSP 
+        key = Number+argsOld[2]
 		
-            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: args[1], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
+            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
 			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
 			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromAcceptorCSPObj)))
 			if err != nil {
@@ -417,7 +417,7 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 
 	
 	if function == "EntitlementFromRecipientCSPQuery" {
-		return t.EntitlementFromRecipientCSP(stub, args)
+		return t.EntitlementFromRecipientCSPQuery(stub, args)
 	} 
 	
 	if function == "RegulatorQuery" {
@@ -432,10 +432,10 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
     if len(args) < 1 {
         return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
     }
-	
-	if len(args) == 2{
+	fmt.Println(len(args))
+	if len(args) == 2 {
 	   key = args[0]+args[1]
-	} else{
+	} else {
 	   key = args[0]
 	}
 
