@@ -126,7 +126,7 @@ func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubI
 		return nil, errors.New("Incorrect number of arguments. Expecting 6")
 	}
 	status1 := "EligibilityConfirmed"
-	key := args[0]+args[1]+args[1]
+	key := args[0]+args[1]+args[2]
 	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
 	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
 			if err != nil {
@@ -151,7 +151,7 @@ func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.Chaincod
 	}
 	
 	status1 := "InitiationConfirmed"
-	key := args[0]+args[1]+args[1]
+	key := args[0]+args[1]+args[2]
 	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
 	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
 			if err != nil {
@@ -175,14 +175,22 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 		return nil, errors.New("Incorrect number of arguments. Expecting 14")
 	}
 
-	// Check the User Acceptance paramater, if true then update world state with new CSP value
+	// Check the User Acceptance paramater, if true then update world state with new status
 	
+	var status1 string
+	key := args[0]+args[1]+args[7]
 	Acceptance := args[13]
 	if(Acceptance == "true"){
-	err := stub.PutState(args[0],[]byte(args[7]))
+	 status1 = "CustomerAccepted"
+	} else {
+	  status1 = "CustomerRejected"
+	}
+	
+	UserAcceptanceObj := UserAcceptance{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: args[7], PlanNew: args[8], ServiceValidityNew: args[9], TalktimeBalanceNew: args[10], SMSbalanceNew: args[11], DataBalanceNew: args[12], CustomerAcceptance: args[13], status: status1}
+    fmt.Println("UserAcceptance Details Structure ",UserAcceptanceObj)
+	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",UserAcceptanceObj)))
 	if err != nil {
 		return nil, err
-	}
 	}
 	
 	fmt.Println("UserAcceptance Information invoke ends...")
