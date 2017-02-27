@@ -39,6 +39,16 @@ type EligibilityConfirm struct {
 	    PortabilityIndicator string
 }
 
+type ConfirmationOfMNPRequest struct {
+
+		Number string
+		ServiceProvider string
+		CustomerName string 
+	    SSNNumber string
+	    PortabilityIndicator string
+		CustomerInitiationRequest string
+}
+
 
 type UserAcceptance struct {
 
@@ -124,6 +134,20 @@ func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubI
 		return nil, err
 	}
 	fmt.Println("EligibilityConfirm  Information invoke ends...")
+	return nil, nil 
+}
+
+func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+    fmt.Println("ConfirmationOfMNPRequest  Information invoke Begins...")
+	
+     //VP0
+	
+	if len(args) != 6 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 6")
+	}
+	
+	fmt.Println("ConfirmationOfMNPRequest  Information invoke ends...")
 	return nil, nil 
 }
 
@@ -398,6 +422,8 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 		return t.EntitlementFromRecipientCSP(stub, args)
 	}else if function == "UserAcceptance" {
 		return t.UserAcceptance(stub, args)
+	}else if function == "ConfirmationOfMNPRequest" {
+		return t.ConfirmationOfMNPRequest(stub, args)
 	} else{
 	    return nil, errors.New("Invalid function name. Expecting 'EligibilityConfirm' or 'UsageDetailsFromDonorCSP' or 'EntitlementFromRecipientCSP' but found '" + function + "'")
 	}
