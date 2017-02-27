@@ -320,7 +320,6 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 // Put the state of Acceptor
 		 
         status1 := "AcceptorAccepeted"
-        key = argsOld[0]+argsOld[1]+argsOld[2]
 		
             UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
 			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
@@ -358,7 +357,6 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
         
 		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
 		// put the value for Regulator Query in future
-		key = args[0]+args[1]+argsNew[1]
 		err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorandAcceptorCSPObj)))
 			if err != nil {
 				return nil, err
