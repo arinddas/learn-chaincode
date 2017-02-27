@@ -479,7 +479,9 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
         return nil, errors.New("Incorrect number of arguments. Expecting name of the key to query")
     }
 	fmt.Println(len(args))
-	if len(args) == 2 {
+	if len(args) == 3 {
+	   key = args[0]+args[1]+args[2]
+	} else if len(args) == 2 {
 	   key = args[0]+args[1]
 	} else {
 	   key = args[0]
