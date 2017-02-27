@@ -33,21 +33,14 @@ type NumberPortabilityChaincode struct {
 type EligibilityConfirm struct {
 
 		Number string
-		ServiceProvider string
+		ServiceProviderOld string
+		ServiceProviderNew string
 		CustomerName string 
 	    SSNNumber string
 	    PortabilityIndicator string
+		status string
 }
 
-type ConfirmationOfMNPRequest struct {
-
-		Number string
-		ServiceProvider string
-		CustomerName string 
-	    SSNNumber string
-	    PortabilityIndicator string
-		CustomerInitiationRequest string
-}
 
 
 type UserAcceptance struct {
@@ -66,6 +59,7 @@ type UserAcceptance struct {
 		SMSbalanceNew string
 		DataBalanceNew string
 		CustomerAcceptance string
+		status string
 		
 }
 
@@ -85,6 +79,7 @@ type UsageDetailsFromDonorandAcceptorCSP struct {
 	    TalktimeBalanceNew string
 		SMSbalanceNew string
 		DataBalanceNew string
+		status string
 		
 }
 
@@ -92,12 +87,14 @@ type UsageDetailsFromDonorandAcceptorCSP struct {
 type UsageDetailsFromCSP struct {
 
 		Number string
-		ServiceProvider string
+		ServiceProviderOld string
+		ServiceProviderNew string
 		Plan string 
 	    ServiceValidity string
 	    TalktimeBalance string
 		SMSbalance string
 		DataBalance string
+		status string
 }
 
 
@@ -125,17 +122,23 @@ func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubI
 	
      //VP0
 	
-	if len(args) != 5 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 5")
+	if len(args) != 6 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 6")
 	}
+	var status1 := "EligibilityConfirmed"
+	key := args[0]+args[1]+args[1]
+	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
+	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
+			if err != nil {
+				return nil, err
+			}
 	
-	err := stub.PutState(args[0],[]byte(args[1]))
-	if err != nil {
-		return nil, err
-	}
+	
 	fmt.Println("EligibilityConfirm  Information invoke ends...")
 	return nil, nil 
 }
+
+
 
 func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
@@ -147,9 +150,18 @@ func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.Chaincod
 		return nil, errors.New("Incorrect number of arguments. Expecting 6")
 	}
 	
+	var status1 := "InitiationConfirmed"
+	key := args[0]+args[1]+args[1]
+	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
+	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
+			if err != nil {
+				return nil, err
+			}
+	
 	fmt.Println("ConfirmationOfMNPRequest  Information invoke ends...")
 	return nil, nil 
 }
+
 
 
 
@@ -186,15 +198,16 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
     fmt.Println("UsageDetailsFromDonorCSP Information invoke Begins...")
 
 
-	if len(args) != 7 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 7")
+	if len(args) != 8 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 8")
 	}
 	
 	    var err error
 		
-		key := args[0]+args[1]
+		var status1 := "DonorApprove"
+		key := args[0]+args[1]+args[2]
 		
-            UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: args[1], Plan: args[2], ServiceValidity: args[3], TalktimeBalance: args[4], SMSbalance: args[5], DataBalance: args[6]}
+            UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7], status: status1}
 			fmt.Println("Donor Service Details Structure ",UsageDetailsFromDonorCSPObj)
 			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorCSPObj)))
 			if err != nil {
@@ -218,7 +231,7 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		var ServiceValidity,TalktimeBalance,SMSbalance,DataBalance int
 		
 	
-		key := argsOld[0]+argsOld[1]
+		key := argsOld[0]+argsOld[1]+argsOld[2]
 		valAsbytes, err := stub.GetState(key)
 		if err != nil {
 			jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
@@ -241,24 +254,24 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 	   
 	    
 	    Number := args[0]
-		Plan := args[2]
+		Plan := args[3]
 		
-	    ServiceValidity, err = strconv.Atoi(args[3])
+	    ServiceValidity, err = strconv.Atoi(args[4])
 		if err != nil {
 		return nil, err
 	    }
 		
-	    TalktimeBalance, err = strconv.Atoi(args[4])
+	    TalktimeBalance, err = strconv.Atoi(args[5])
 		if err != nil {
 		return nil, err
 	    }
 		
-		SMSbalance, err = strconv.Atoi(args[5])
+		SMSbalance, err = strconv.Atoi(args[6])
 		if err != nil {
 		return nil, err
 	    }
 		
-		DataBalance, err = strconv.Atoi(args[6])
+		DataBalance, err = strconv.Atoi(args[7])
 		if err != nil {
 		return nil, err
 	    }
@@ -299,10 +312,10 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 
 		 // Put the state of Acceptor
 		 
-		// number + newCSP 
-        key = Number+argsOld[2]
+        var status1 := "AcceptorAccepeted"
+        key = argsOld[0]+argsOld[1]+argsOld[2]
 		
-            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProvider: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew}
+            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
 			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
 			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromAcceptorCSPObj)))
 			if err != nil {
@@ -329,12 +342,12 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		
 		argsNew := strings.Split(acceptorDetails, " ")
 		
-		fmt.Println("Acceptor Service Details Structure",argsNew)
+		fmt.Println("Acceptor Service Details Structure",argsNew)*/
 		
 		
 		
 		
-		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: argsNew[1], PlanNew: argsNew[2], ServiceValidityNew: argsNew[3], TalktimeBalanceNew: argsNew[4], SMSbalanceNew: argsNew[5], DataBalanceNew: argsNew[6]}
+		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[3], ServiceValidityOld: args[4], TalktimeBalanceOld: args[5], SMSbalanceOld: args[6], DataBalanceOld: args[7], ServiceProviderNew: argsNew[2], PlanNew: argsNew[3], ServiceValidityNew: argsNew[4], TalktimeBalanceNew: argsNew[5], SMSbalanceNew: argsNew[6], DataBalanceNew: argsNew[7], status: status1}
         
 		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
 		// put the value for Regulator Query in future
@@ -346,7 +359,6 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 			
 			
 		fmt.Println("Invoke EntitlementFromRecipientCSP Chaincode... end") 
-		//return []byte(fmt.Sprintf("%s",UsageDetailsFromDonorandAcceptorCSPObj)), nil
 		return nil,nil
 	
 	
