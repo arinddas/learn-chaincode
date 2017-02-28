@@ -212,7 +212,7 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
 	
 	    var err error
 		
-		status1 := "DonorApprove"
+		status1 := "DonorApproved"
 		key := args[0]+args[1]+args[2]
 		
             UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7], status: status1}
@@ -319,7 +319,7 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 
 		 // Put the state of Acceptor
 		 
-        status1 := "AcceptorAccepted"
+        status1 := "AcceptorApproved"
 		
             UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
 			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
