@@ -319,7 +319,7 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 
 		 // Put the state of Acceptor
 		 
-        status1 := "AcceptorAccepeted"
+        status1 := "AcceptorAccepted"
 		
             UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
 			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
@@ -390,7 +390,7 @@ func (t *NumberPortabilityChaincode) RegulatorQuery(stub shim.ChaincodeStubInter
         return nil, errors.New(jsonResp)
 	}
 
-	fmt.Println("Query NumberPoratbility Chaincode... end") 
+	fmt.Println("Query NumberPortability Chaincode... end") 
     return valAsbytes, nil 
 
 }
