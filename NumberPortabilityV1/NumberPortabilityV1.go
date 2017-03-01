@@ -321,7 +321,7 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 	 
 	 
 	 err = stub.DeleteRow(
-		"AssetsOwnership",
+		"NumberPortabilityDetails",
 		[]shim.Column{shim.Column{Value: &shim.Column_String_{String_: args[0]}}},
 	)
 	if err != nil {
