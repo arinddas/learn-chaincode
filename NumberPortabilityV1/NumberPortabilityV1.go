@@ -198,6 +198,7 @@ func (t *NumberPortabilityChaincode) EligibilityConfirmQuery(stub shim.Chaincode
 		CustomerName := fmt.Sprintf("%s", row.Columns[2].GetBytes())
 		SSNNumber := fmt.Sprintf("%s", row.Columns[3].GetBytes())
 		PortabilityIndicator := fmt.Sprintf("%s", row.Columns[4].GetBytes())
+		CustomerName := string(row.Columns[2].GetBytes())
 		
 		str := `{"Number": "` + args[0] + `", "ServiceProvider": "` + ServiceProvider + `", "CustomerName": ` + CustomerName + `, "SSNNumber": "` + SSNNumber + `", "PortabilityIndicator": "` + PortabilityIndicator + `"}`
         
