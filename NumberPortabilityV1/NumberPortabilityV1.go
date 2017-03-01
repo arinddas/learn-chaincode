@@ -194,11 +194,10 @@ func (t *NumberPortabilityChaincode) EligibilityConfirmQuery(stub shim.Chaincode
 		
 		
 		
-		ServiceProvider := fmt.Sprintf("%s", string(row.Columns[1].GetBytes()))
-		CustomerName := fmt.Sprintf("%s", row.Columns[2].GetBytes())
-		SSNNumber := fmt.Sprintf("%s", row.Columns[3].GetBytes())
-		PortabilityIndicator := fmt.Sprintf("%s", row.Columns[4].GetBytes())
-		CustomerName = string(row.Columns[2].GetBytes())
+		ServiceProvider := row.Columns[1].GetString_()
+		CustomerName := row.Columns[2].GetString_()
+		SSNNumber := row.Columns[3].GetString_()
+		PortabilityIndicator := row.Columns[4].GetString_()
 		
 		str := `{"Number": "` + args[0] + `", "ServiceProvider": "` + ServiceProvider + `", "CustomerName": ` + CustomerName + `, "SSNNumber": "` + SSNNumber + `", "PortabilityIndicator": "` + PortabilityIndicator + `"}`
         
@@ -313,8 +312,8 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 		
 		
 		ServiceProvider := args[7]
-		CustomerName := fmt.Sprintf("%s", row.Columns[2].GetBytes())
-		SSNNumber := fmt.Sprintf("%s", row.Columns[3].GetBytes())
+		CustomerName := row.Columns[2].GetString_()
+		SSNNumber := row.Columns[3].GetString_()
 		PortabilityIndicator := "false"
 		
 	
