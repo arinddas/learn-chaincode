@@ -49,7 +49,7 @@ type EligibilityConfirm struct {
 		CustomerName string `json:"CustomerName"`
 	    SSNNumber string `json:"SSNNumber"`
 	    PortabilityIndicator string `json:"PortabilityIndicator"`
-		status string `json:"status"`
+		Status string `json:"Status"`
 }
 
 
@@ -70,7 +70,7 @@ type UserAcceptance struct {
 		SMSbalanceNew string `json:"SMSbalanceNew"`
 		DataBalanceNew string `json:"DataBalanceNew"`
 		CustomerAcceptance string `json:"CustomerAcceptance"`
-		status string `json:"status"`
+		Status string `json:"Status"`
 		
 }
 
@@ -90,7 +90,7 @@ type UsageDetailsFromDonorandAcceptorCSP struct {
 	    TalktimeBalanceNew string `json:"TalktimeBalanceNew"`
 		SMSbalanceNew string `json:"SMSbalanceNew"`
 		DataBalanceNew string `json:"DataBalanceNew"`
-		status string `json:"status"`
+		Status string `json:"Status"`
 		
 }
 
@@ -105,7 +105,7 @@ type UsageDetailsFromCSP struct {
 	    TalktimeBalance string `json:"TalktimeBalance"`
 		SMSbalance string `json:"SMSbalance"`
 		DataBalance string `json:"DataBalance"`
-		status string `json:"status"`
+		Status string `json:"Status"`
 }
 
 
@@ -233,9 +233,9 @@ func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubI
 	if len(args) != 6 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 6")
 	}
-	status1 := "EligibilityConfirmed"
+	Status1 := "EligibilityConfirmed"
 	key := args[0]+args[1]+args[2]
-	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
+	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], Status: Status1}
 	res2F, _ := json.Marshal(EligibilityConfirmObj)
     fmt.Println(string(res2F))
 	err := stub.PutState(key,[]byte(string(res2F)))
@@ -260,9 +260,9 @@ func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.Chaincod
 		return nil, errors.New("Incorrect number of arguments. Expecting 6")
 	}
 	
-	status1 := "InitiationConfirmed"
+	Status1 := "InitiationConfirmed"
 	key := args[0]+args[1]+args[2]
-	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
+	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], Status: Status1}
 	res2F, _ := json.Marshal(EligibilityConfirmObj)
     fmt.Println(string(res2F))
 	err := stub.PutState(key,[]byte(string(res2F)))
@@ -288,13 +288,13 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 		return nil, errors.New("Incorrect number of arguments. Expecting 14")
 	}
 
-	// Check the User Acceptance paramater, if true then update world state with new status
+	// Check the User Acceptance paramater, if true then update world state with new Status
 	
-	var status1 string
+	var Status1 string
 	key := args[0]+args[1]+args[7]
 	Acceptance := args[13]
 	if(Acceptance == "true"){
-	 status1 = "CustomerAccepted"
+	 Status1 = "CustomerAccepted"
 	 
 	 //update the row with new ServiceProvider
 	 
@@ -349,10 +349,10 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 	 
 	 
 	} else {
-	  status1 = "CustomerRejected"
+	  Status1 = "CustomerRejected"
 	}
 	
-	UserAcceptanceObj := UserAcceptance{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: args[7], PlanNew: args[8], ServiceValidityNew: args[9], TalktimeBalanceNew: args[10], SMSbalanceNew: args[11], DataBalanceNew: args[12], CustomerAcceptance: args[13], status: status1}
+	UserAcceptanceObj := UserAcceptance{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: args[7], PlanNew: args[8], ServiceValidityNew: args[9], TalktimeBalanceNew: args[10], SMSbalanceNew: args[11], DataBalanceNew: args[12], CustomerAcceptance: args[13], Status: Status1}
 	res2F, _ := json.Marshal(UserAcceptanceObj)
     fmt.Println(string(res2F))
 	err := stub.PutState(key,[]byte(string(res2F)))
@@ -380,10 +380,10 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
 	
 	    var err error
 		
-		status1 := "DonorApproved"
+		Status1 := "DonorApproved"
 		key := args[0]+args[1]+args[2]
 		
-            UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7], status: status1}
+            UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7], Status: Status1}
 			res2F, _ := json.Marshal(UsageDetailsFromDonorCSPObj)
 		    fmt.Println(string(res2F))
 		    err = stub.PutState(key,[]byte(string(res2F)))
@@ -485,9 +485,9 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		 
 		 // Put the state of Acceptor
 		 
-        status1 := "AcceptorApproved"
+        Status1 := "AcceptorApproved"
 		
-            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
+            UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, Status: Status1}
 			res2F, _ := json.Marshal(UsageDetailsFromAcceptorCSPObj)
 		    fmt.Println(string(res2F))
 		    err = stub.PutState(key,[]byte(string(res2F)))
@@ -497,7 +497,7 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		
 		
 		
-		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], PlanOld: res.Plan, ServiceValidityOld: res.ServiceValidity, TalktimeBalanceOld: res.TalktimeBalance, SMSbalanceOld: res.SMSbalance, DataBalanceOld: res.DataBalance, ServiceProviderNew: argsOld[2], PlanNew: Plan, ServiceValidityNew: ServiceValidityNew, TalktimeBalanceNew: TalktimeBalanceNew, SMSbalanceNew: SMSbalanceNew, DataBalanceNew: DataBalanceNew, status: status1}
+		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], PlanOld: res.Plan, ServiceValidityOld: res.ServiceValidity, TalktimeBalanceOld: res.TalktimeBalance, SMSbalanceOld: res.SMSbalance, DataBalanceOld: res.DataBalance, ServiceProviderNew: argsOld[2], PlanNew: Plan, ServiceValidityNew: ServiceValidityNew, TalktimeBalanceNew: TalktimeBalanceNew, SMSbalanceNew: SMSbalanceNew, DataBalanceNew: DataBalanceNew, Status: Status1}
         
 		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
 		// put the value for Regulator Query in future
