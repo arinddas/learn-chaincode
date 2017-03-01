@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"strings"
+	"encoding/json"
 )
 
 // NumberPortabilityChaincode is simple chaincode implementing logging to Blockchain
@@ -30,71 +30,82 @@ import (
 type NumberPortabilityChaincode struct {
 }
 
+
+type Assign struct {
+
+		Number string `json:"Number"`
+		ServiceProvider string `json:"ServiceProvider"`
+		CustomerName string `json:"CustomerName"`
+	    SSNNumber string `json:"SSNNumber"`
+	    PortabilityIndicator string `json:"PortabilityIndicator"`
+}
+
+
 type EligibilityConfirm struct {
 
-		Number string
-		ServiceProviderOld string
-		ServiceProviderNew string
-		CustomerName string 
-	    SSNNumber string
-	    PortabilityIndicator string
-		status string
+		Number string `json:"Number"`
+		ServiceProviderOld string `json:"ServiceProviderOld"`
+		ServiceProviderNew string `json:"ServiceProviderNew"`
+		CustomerName string `json:"CustomerName"`
+	    SSNNumber string `json:"SSNNumber"`
+	    PortabilityIndicator string `json:"PortabilityIndicator"`
+		status string `json:"status"`
 }
 
 
 
 type UserAcceptance struct {
 
-		Number string
-		ServiceProviderOld string
-		PlanOld string 
-	    ServiceValidityOld string
-	    TalktimeBalanceOld string
-		SMSbalanceOld string
-		DataBalanceOld string
-		ServiceProviderNew string
-		PlanNew string 
-	    ServiceValidityNew string
-	    TalktimeBalanceNew string
-		SMSbalanceNew string
-		DataBalanceNew string
-		CustomerAcceptance string
-		status string
+		Number string `json:"Number"`
+		ServiceProviderOld string `json:"ServiceProviderOld"`
+		PlanOld string `json:"PlanOld"` 
+	    ServiceValidityOld string `json:"ServiceValidityOld"`
+	    TalktimeBalanceOld string `json:"TalktimeBalanceOld"`
+		SMSbalanceOld string `json:"SMSbalanceOld"`
+		DataBalanceOld string `json:"DataBalanceOld"`
+		ServiceProviderNew string `json:"ServiceProviderNew"`
+		PlanNew string `json:"PlanNew"` 
+	    ServiceValidityNew string `json:"ServiceValidityNew"`
+	    TalktimeBalanceNew string `json:"TalktimeBalanceNew"`
+		SMSbalanceNew string `json:"SMSbalanceNew"`
+		DataBalanceNew string `json:"DataBalanceNew"`
+		CustomerAcceptance string `json:"CustomerAcceptance"`
+		status string `json:"status"`
 		
 }
 
 
 type UsageDetailsFromDonorandAcceptorCSP struct {
 
-		Number string
-		ServiceProviderOld string
-		PlanOld string 
-	    ServiceValidityOld string
-	    TalktimeBalanceOld string
-		SMSbalanceOld string
-		DataBalanceOld string
-		ServiceProviderNew string
-		PlanNew string 
-	    ServiceValidityNew string
-	    TalktimeBalanceNew string
-		SMSbalanceNew string
-		DataBalanceNew string
-		status string
+		Number string `json:"Number"`
+		ServiceProviderOld string `json:"ServiceProviderOld"`
+		PlanOld string `json:"PlanOld"`
+	    ServiceValidityOld string `json:"ServiceValidityOld"`
+	    TalktimeBalanceOld string `json:"TalktimeBalanceOld"`
+		SMSbalanceOld string `json:"SMSbalanceOld"`
+		DataBalanceOld string `json:"DataBalanceOld"`
+		ServiceProviderNew string `json:"ServiceProviderNew"`
+		PlanNew string `json:"PlanNew"` 
+	    ServiceValidityNew string `json:"ServiceValidityNew"`
+	    TalktimeBalanceNew string `json:"TalktimeBalanceNew"`
+		SMSbalanceNew string `json:"SMSbalanceNew"`
+		DataBalanceNew string `json:"DataBalanceNew"`
+		status string `json:"status"`
 		
 }
 
 
 type UsageDetailsFromCSP struct {
 
-		Number string
-		ServiceProviderOld string
-		ServiceProviderNew string
-		Plan string 
-	    ServiceValidity string
-	    TalktimeBalance string
-		SMSbalance string
-		DataBalance string
-		status string
+		Number string `json:"Number"`
+		ServiceProviderOld string `json:"ServiceProviderOld"`
+		ServiceProviderNew string `json:"ServiceProviderNew"`
+		Plan string `json:"Plan"` 
+	    ServiceValidity string `json:"ServiceValidity"`
+	    TalktimeBalance string `json:"TalktimeBalance"`
+		SMSbalance string `json:"SMSbalance"`
+		DataBalance string `json:"DataBalance"`
+		status string `json:"status"`
 }
 
 
@@ -105,6 +116,18 @@ func (t *NumberPortabilityChaincode) Init(stub shim.ChaincodeStubInterface, func
 	if len(args) != 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 0")
 	}
+	
+	// Create table
+	err := stub.CreateTable("NumberPortabilityDetails", []*shim.ColumnDefinition{
+		&shim.ColumnDefinition{Name: "Number", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "ServiceProvider", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "CustomerName", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "SSNNumber", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "PortabilityIndicator", Type: shim.ColumnDefinition_STRING, Key: false},
+	})
+	if err != nil {
+		return nil, errors.New("Failed creating AssetsOnwership table.")
+	}
 
 	fmt.Println("Init Chaincode...done")
 
@@ -112,6 +135,91 @@ func (t *NumberPortabilityChaincode) Init(stub shim.ChaincodeStubInterface, func
 }
 
 
+// assign function
+
+func (t *NumberPortabilityChaincode) Assign(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+    fmt.Println("Assign invoke Begins...")
+	
+     //VP0
+	
+	if len(args) != 5 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 5")
+	}
+	
+	ok, err := stub.InsertRow("NumberPortabilityDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[1]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[2]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[3]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[4]}},
+	      },
+		  })
+	  if err != nil {
+			return nil, fmt.Errorf("insert Record operation failed. %s", err)
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+	
+	fmt.Println("Assign invoke ends...")
+	return nil, nil 
+}
+
+//
+
+
+func (t *NumberPortabilityChaincode) EligibilityConfirmQuery(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+    var key string
+    var err error
+
+    if len(args) != 1 {
+        return nil, errors.New("Incorrect number of arguments. Expecting 1 argument")
+    }
+
+    key = args[0]
+	
+    var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: key}}
+	columns = append(columns, col1)
+
+	row, err := stub.GetRow("NumberPortabilityDetails", columns)
+	if err != nil {
+		fmt.Println("Failed retriving details of %s: %s", string(key), err)
+		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(key), err)
+	}
+	
+    if len(row.Columns) != 0{
+		
+		
+		
+		ServiceProvider := fmt.Sprintf("%s", row.Columns[1].GetBytes())
+		CustomerName := fmt.Sprintf("%s", row.Columns[2].GetBytes())
+		SSNNumber := fmt.Sprintf("%s", row.Columns[3].GetBytes())
+		PortabilityIndicator := fmt.Sprintf("%s", row.Columns[4].GetBytes())
+		
+		str := `{"Number": "` + args[0] + `", "ServiceProvider": "` + ServiceProvider + `", "CustomerName": ` + CustomerName + `, "SSNNumber": "` + SSNNumber + `", "PortabilityIndicator": "` + PortabilityIndicator + `"}`
+        
+		
+		
+		rowString := fmt.Sprintf("%s", str)
+		fmt.Println("Query Done : Details :: %s", str)
+		return []byte(rowString), nil		
+		
+		}else{
+	    fmt.Println("MobileNumber : %s not assigned to anyone ", string(key))
+		fmt.Println("Query NumberPortability Chaincode... end") 
+		return nil, fmt.Errorf("MobileNumber : %s not assigned to anyone ", string(key))
+	}
+	
+
+
+
+
+	
+
+}
 
 
 // CGTA invoke function
@@ -128,7 +236,9 @@ func (t *NumberPortabilityChaincode) EligibilityConfirm(stub shim.ChaincodeStubI
 	status1 := "EligibilityConfirmed"
 	key := args[0]+args[1]+args[2]
 	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
-	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
+	res2F, _ := json.Marshal(EligibilityConfirmObj)
+    fmt.Println(string(res2F))
+	err := stub.PutState(key,[]byte(string(res2F)))
 			if err != nil {
 				return nil, err
 			}
@@ -153,10 +263,13 @@ func (t *NumberPortabilityChaincode) ConfirmationOfMNPRequest(stub shim.Chaincod
 	status1 := "InitiationConfirmed"
 	key := args[0]+args[1]+args[2]
 	EligibilityConfirmObj := EligibilityConfirm{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], CustomerName: args[3], SSNNumber: args[4], PortabilityIndicator: args[5], status: status1}
-	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",EligibilityConfirmObj)))
+	res2F, _ := json.Marshal(EligibilityConfirmObj)
+    fmt.Println(string(res2F))
+	err := stub.PutState(key,[]byte(string(res2F)))
 			if err != nil {
 				return nil, err
 			}
+	
 	
 	fmt.Println("ConfirmationOfMNPRequest  Information invoke ends...")
 	return nil, nil 
@@ -182,16 +295,71 @@ func (t *NumberPortabilityChaincode) UserAcceptance(stub shim.ChaincodeStubInter
 	Acceptance := args[13]
 	if(Acceptance == "true"){
 	 status1 = "CustomerAccepted"
+	 
+	 //update the row with new ServiceProvider
+	 
+	var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+	columns = append(columns, col1)
+
+	row, err := stub.GetRow("NumberPortabilityDetails", columns)
+	if err != nil {
+		fmt.Println("Failed retriving details of %s: %s", string(args[0]), err)
+		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+	}
+	
+    if len(row.Columns) != 0{
+		
+		
+		ServiceProvider := args[7]
+		CustomerName := fmt.Sprintf("%s", row.Columns[2].GetBytes())
+		SSNNumber := fmt.Sprintf("%s", row.Columns[3].GetBytes())
+		PortabilityIndicator := "false"
+		
+	
+	 
+	 
+	 
+	 err = stub.DeleteRow(
+		"AssetsOwnership",
+		[]shim.Column{shim.Column{Value: &shim.Column_String_{String_: args[0]}}},
+	)
+	if err != nil {
+		return nil, errors.New("Failed deleting row.")
+	}
+	
+	ok, errNew := stub.InsertRow("NumberPortabilityDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
+			&shim.Column{Value: &shim.Column_String_{String_: ServiceProvider}},
+			&shim.Column{Value: &shim.Column_String_{String_: CustomerName}},
+			&shim.Column{Value: &shim.Column_String_{String_: SSNNumber}},
+			&shim.Column{Value: &shim.Column_String_{String_: PortabilityIndicator}},
+	      },
+		  })
+	  if errNew != nil {
+			return nil, fmt.Errorf("insert Record operation failed. %s", errNew)
+		}
+		if !ok {
+			return nil, errors.New("MobileNumber is already assigned.")
+		}
+	
+	
+	 }
+	 
+	 
 	} else {
 	  status1 = "CustomerRejected"
 	}
 	
 	UserAcceptanceObj := UserAcceptance{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[2], ServiceValidityOld: args[3], TalktimeBalanceOld: args[4], SMSbalanceOld: args[5], DataBalanceOld: args[6], ServiceProviderNew: args[7], PlanNew: args[8], ServiceValidityNew: args[9], TalktimeBalanceNew: args[10], SMSbalanceNew: args[11], DataBalanceNew: args[12], CustomerAcceptance: args[13], status: status1}
-    fmt.Println("UserAcceptance Details Structure ",UserAcceptanceObj)
-	err := stub.PutState(key,[]byte(fmt.Sprintf("%s",UserAcceptanceObj)))
-	if err != nil {
-		return nil, err
-	}
+	res2F, _ := json.Marshal(UserAcceptanceObj)
+    fmt.Println(string(res2F))
+	err := stub.PutState(key,[]byte(string(res2F)))
+			if err != nil {
+				return nil, err
+			}
+	
 	
 	fmt.Println("UserAcceptance Information invoke ends...")
 	return nil, nil
@@ -216,8 +384,9 @@ func (t *NumberPortabilityChaincode) UsageDetailsFromDonorCSP(stub shim.Chaincod
 		key := args[0]+args[1]+args[2]
 		
             UsageDetailsFromDonorCSPObj := UsageDetailsFromCSP{Number: args[0], ServiceProviderOld: args[1], ServiceProviderNew: args[2], Plan: args[3], ServiceValidity: args[4], TalktimeBalance: args[5], SMSbalance: args[6], DataBalance: args[7], status: status1}
-			fmt.Println("Donor Service Details Structure ",UsageDetailsFromDonorCSPObj)
-			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorCSPObj)))
+			res2F, _ := json.Marshal(UsageDetailsFromDonorCSPObj)
+		    fmt.Println(string(res2F))
+		    err = stub.PutState(key,[]byte(string(res2F)))
 			if err != nil {
 				return nil, err
 			}
@@ -240,6 +409,7 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		
 	
 		key := argsOld[0]+argsOld[1]+argsOld[2]
+		
 		valAsbytes, err := stub.GetState(key)
 		if err != nil {
 			jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
@@ -249,36 +419,32 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 			return nil, errors.New(jsonResp)
 		}
 		
-		donorDetails := fmt.Sprintf("%s", valAsbytes)
+		res := UsageDetailsFromCSP{}
+        json.Unmarshal(valAsbytes, &res)
+        
 		
-		donorDetails = strings.Trim(donorDetails,"{")
-		donorDetails = strings.Trim(donorDetails,"}")
-		donorDetails = strings.Trim(donorDetails,"[")
-		donorDetails = strings.Trim(donorDetails,"]")
 		
-		args := strings.Split(donorDetails, " ")
-		
-	    fmt.Println("Donor Service Details Structure",args)
+	    fmt.Println("Donor Service Details Structure",res)
 	   
 	    
-		Plan := args[3]
+		Plan := res.Plan
 		
-	    ServiceValidity, err = strconv.Atoi(args[4])
+	    ServiceValidity, err = strconv.Atoi(res.ServiceValidity)
 		if err != nil {
 		return nil, err
 	    }
 		
-	    TalktimeBalance, err = strconv.Atoi(args[5])
+	    TalktimeBalance, err = strconv.Atoi(res.TalktimeBalance)
 		if err != nil {
 		return nil, err
 	    }
 		
-		SMSbalance, err = strconv.Atoi(args[6])
+		SMSbalance, err = strconv.Atoi(res.SMSbalance)
 		if err != nil {
 		return nil, err
 	    }
 		
-		DataBalance, err = strconv.Atoi(args[7])
+		DataBalance, err = strconv.Atoi(res.DataBalance)
 		if err != nil {
 		return nil, err
 	    }
@@ -322,38 +488,16 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
         status1 := "AcceptorApproved"
 		
             UsageDetailsFromAcceptorCSPObj := UsageDetailsFromCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], ServiceProviderNew: argsOld[2], Plan: Plan, ServiceValidity: ServiceValidityNew, TalktimeBalance: TalktimeBalanceNew, SMSbalance: SMSbalanceNew, DataBalance: DataBalanceNew, status: status1}
-			fmt.Println("Acceptor Service Details Structure",UsageDetailsFromAcceptorCSPObj)
-			err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromAcceptorCSPObj)))
+			res2F, _ := json.Marshal(UsageDetailsFromAcceptorCSPObj)
+		    fmt.Println(string(res2F))
+		    err = stub.PutState(key,[]byte(string(res2F)))
 			if err != nil {
 				return nil, err
 			}
 		
-	
-	    valAsbytesNew, errNew := stub.GetState(key)
-		if errNew != nil {
-			jsonResp := "{\"Error\":\"Failed to get state for " + key + "\"}"
-			return nil, errors.New(jsonResp)
-		} else if len(valAsbytes) == 0{
-			jsonResp := "{\"Error\":\"Failed to get Query for " + key + "\"}"
-			return nil, errors.New(jsonResp)
-		}
 		
 		
-		acceptorDetails := fmt.Sprintf("%s", valAsbytesNew)
-		
-		acceptorDetails = strings.Trim(acceptorDetails,"{")
-		acceptorDetails = strings.Trim(acceptorDetails,"}")
-		acceptorDetails = strings.Trim(acceptorDetails,"[")
-		acceptorDetails = strings.Trim(acceptorDetails,"]")
-		
-		argsNew := strings.Split(acceptorDetails, " ")
-		
-		fmt.Println("Acceptor Service Details Structure",argsNew)
-		
-		
-		
-		
-		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: args[0], ServiceProviderOld: args[1], PlanOld: args[3], ServiceValidityOld: args[4], TalktimeBalanceOld: args[5], SMSbalanceOld: args[6], DataBalanceOld: args[7], ServiceProviderNew: argsNew[2], PlanNew: argsNew[3], ServiceValidityNew: argsNew[4], TalktimeBalanceNew: argsNew[5], SMSbalanceNew: argsNew[6], DataBalanceNew: argsNew[7], status: status1}
+		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], PlanOld: res.Plan, ServiceValidityOld: res.ServiceValidity, TalktimeBalanceOld: res.TalktimeBalance, SMSbalanceOld: res.SMSbalance, DataBalanceOld: res.DataBalance, ServiceProviderNew: argsOld[2], PlanNew: Plan, ServiceValidityNew: ServiceValidityNew, TalktimeBalanceNew: TalktimeBalanceNew, SMSbalanceNew: SMSbalanceNew, DataBalanceNew: DataBalanceNew, status: status1}
         
 		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
 		// put the value for Regulator Query in future
@@ -369,6 +513,13 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 	
 
 }
+
+
+
+
+
+
+
 
 // args should be Number, serviceProviderOld, serviceProviderNew
 
@@ -441,10 +592,11 @@ func (t *NumberPortabilityChaincode) Invoke(stub shim.ChaincodeStubInterface, fu
 		return t.UserAcceptance(stub, args)
 	}else if function == "ConfirmationOfMNPRequest" {
 		return t.ConfirmationOfMNPRequest(stub, args)
+	}else if function == "Assign" {
+		return t.ConfirmationOfMNPRequest(stub, args)
 	} else{
 	    return nil, errors.New("Invalid function name. Expecting 'EligibilityConfirm' or 'UsageDetailsFromDonorCSP' or 'EntitlementFromRecipientCSP' but found '" + function + "'")
 	}
-	
 	
 	fmt.Println("Invoke Numberportability Chaincode... end") 
 	
@@ -467,6 +619,11 @@ func (t *NumberPortabilityChaincode) Query(stub shim.ChaincodeStubInterface, fun
 	if function == "RegulatorQuery" {
 		return t.RegulatorQuery(stub, args)
 	} 
+	
+	if function == "EligibilityConfirmQuery" {
+		return t.EligibilityConfirmQuery(stub, args)
+	} 
+	
 	
 	// else We can query WorldState to fetch value
 	
