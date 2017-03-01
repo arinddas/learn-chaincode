@@ -155,7 +155,7 @@ func (t *NumberPortabilityChaincode) Assign(stub shim.ChaincodeStubInterface, ar
 			&shim.Column{Value: &shim.Column_String_{String_: args[3]}},
 			&shim.Column{Value: &shim.Column_String_{String_: args[4]}},
 	      },
-		  })\
+		  })
 	  if err != nil {
 			return nil, fmt.Errorf("insert Record operation failed. %s", err)
 		}
