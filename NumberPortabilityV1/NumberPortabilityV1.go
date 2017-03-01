@@ -155,7 +155,7 @@ func (t *NumberPortabilityChaincode) Assign(stub shim.ChaincodeStubInterface, ar
 			&shim.Column{Value: &shim.Column_String_{String_: args[3]}},
 			&shim.Column{Value: &shim.Column_String_{String_: args[4]}},
 	      },
-		  })
+		  })\
 	  if err != nil {
 			return nil, fmt.Errorf("insert Record operation failed. %s", err)
 		}
@@ -498,13 +498,16 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		
 		
 		UsageDetailsFromDonorandAcceptorCSPObj := UsageDetailsFromDonorandAcceptorCSP{Number: argsOld[0], ServiceProviderOld: argsOld[1], PlanOld: res.Plan, ServiceValidityOld: res.ServiceValidity, TalktimeBalanceOld: res.TalktimeBalance, SMSbalanceOld: res.SMSbalance, DataBalanceOld: res.DataBalance, ServiceProviderNew: argsOld[2], PlanNew: Plan, ServiceValidityNew: ServiceValidityNew, TalktimeBalanceNew: TalktimeBalanceNew, SMSbalanceNew: SMSbalanceNew, DataBalanceNew: DataBalanceNew, Status: Status1}
-        
-		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
-		// put the value for Regulator Query in future
-		err = stub.PutState(key,[]byte(fmt.Sprintf("%s",UsageDetailsFromDonorandAcceptorCSPObj)))
+        res2F, _ = json.Marshal(UsageDetailsFromDonorandAcceptorCSPObj)
+		    fmt.Println(string(res2F))
+		    err = stub.PutState(key,[]byte(string(res2F)))
 			if err != nil {
 				return nil, err
 			}
+		
+		
+		
+		fmt.Println("Donor+Acceptor Service Details Structure",UsageDetailsFromDonorandAcceptorCSPObj)
 			
 			
 		fmt.Println("Invoke EntitlementFromRecipientCSP Chaincode... end") 
