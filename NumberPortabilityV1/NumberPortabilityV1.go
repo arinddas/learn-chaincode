@@ -199,7 +199,7 @@ func (t *NumberPortabilityChaincode) EligibilityConfirmQuery(stub shim.Chaincode
 		SSNNumber := row.Columns[3].GetString_()
 		PortabilityIndicator := row.Columns[4].GetString_()
 		
-		str := `{"Number": "` + args[0] + `", "ServiceProvider": "` + ServiceProvider + `", "CustomerName": ` + CustomerName + `, "SSNNumber": "` + SSNNumber + `", "PortabilityIndicator": "` + PortabilityIndicator + `"}`
+		str := `{"Number": "` + args[0] + `", "ServiceProvider": "` + ServiceProvider + `", "CustomerName": "` + CustomerName + `", "SSNNumber": "` + SSNNumber + `", "PortabilityIndicator": "` + PortabilityIndicator + `"}`
         
 		
 		
