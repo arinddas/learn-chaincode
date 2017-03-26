@@ -429,8 +429,8 @@ func (t *NumberPortabilityChaincode) EntitlementFromRecipientCSP(stub shim.Chain
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	    }
 		
-		if(args[3] != "user_type1_0") {
-	    return nil, fmt.Errorf("User: %s not Authorized for this transaction:  ", string(args[3]))
+		if(argsOld[3] != "user_type1_0") {
+	    return nil, fmt.Errorf("User: %s not Authorized for this transaction:  ", string(argsOld[3]))
 	    }
 		
 		var ServiceValidity,TalktimeBalance,SMSbalance,DataBalance int
