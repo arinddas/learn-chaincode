@@ -276,7 +276,7 @@ func (t *RoamingSolutionChaincode) Query(stub shim.ChaincodeStubInterface, funct
         return nil, errors.New(jsonResp)
 	}
 
-	fmt.Println("Query NumberPoratbility Chaincode... end") 
+	fmt.Println("Query RoamingSolution Chaincode... end") 
     return valAsbytes, nil 
   
 	
