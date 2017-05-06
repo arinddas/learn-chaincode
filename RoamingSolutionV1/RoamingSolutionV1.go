@@ -42,6 +42,13 @@ type CDR struct {
 		Status string `json:"Status"`
 }
 
+type CDRALL struct {
+
+		CDRDetail []CDR `json:"CDRDetail"`
+}
+
+
+
 
 
 type Subscriber struct {
@@ -464,6 +471,48 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 
 }
 
+func (t *RoamingSolutionChaincode) GetALLQuery(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+
+    fmt.Println("EntitlementFromHPMN Query Begins...")
+	
+	var columns []shim.Column
+	
+
+	rows, err := stub.GetRows("RoamingDetails", columns)
+	
+	if err != nil {
+		jsonResp := "{\"Error\":\"Failed to get the data \"}"
+		return nil, errors.New(jsonResp)
+	}
+	
+	 var cdrAll CDRALL
+     //var cdr CDR
+	 
+	 cdrAll.CDRDetail = make([]CDR, 0)
+	
+	for row := range rows {		
+		
+			Number := row.Columns[1].GetString_()
+			TimeStamp := row.Columns[2].GetString_()
+			CallDuration := row.Columns[3].GetString_()
+			CallCost := row.Columns[4].GetString_()
+			DataDuration := row.Columns[5].GetString_()
+			DataCost := row.Columns[6].GetString_()
+			Status1 := row.Columns[7].GetString_()
+		
+		
+            CDRobj := CDR{Number: Number, TimeStamp: TimeStamp, CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
+			
+			cdrAll.CDRDetail = append(cdrAll.CDRDetail, CDRobj)
+		
+	}
+		mapB, _ := json.Marshal(cdrAll)
+        fmt.Println(string(mapB))
+	
+	    return mapB, nil
+
+}
 
 
 // Invoke Function
@@ -502,6 +551,10 @@ func (t *RoamingSolutionChaincode) Query(stub shim.ChaincodeStubInterface, funct
 	if function == "EntitlementFromHPMNQuery" {
 		return t.EntitlementFromHPMNQuery(stub, args)
 	} 
+	if function == "GetALLQuery" {
+		return t.GetALLQuery(stub, args)
+	} 
+	
 
 	key := args[0]
 
