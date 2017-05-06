@@ -72,7 +72,7 @@ func (t *RoamingSolutionChaincode) Init(stub shim.ChaincodeStubInterface, functi
 	// Create Subscriber Details table
 	err := stub.CreateTable("RoamingDetails", []*shim.ColumnDefinition{
 		&shim.ColumnDefinition{Name: "Number", Type: shim.ColumnDefinition_STRING, Key: true},
-		&shim.ColumnDefinition{Name: "TimeStamp", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "TimeStamp", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "CallDuration", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "CallCost", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "DataDuration", Type: shim.ColumnDefinition_STRING, Key: false},
@@ -146,10 +146,15 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
 	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+	
+	fmt.Println("col1",col1)
+	fmt.Println("col2",col2)
+	
 	columns = append(columns, col1)
 	columns = append(columns, col2)
 	
-	 fmt.Println("columns of query",columns);
+	
+	 fmt.Println("columns of query",columns)
 
 	row, err := stub.GetRow("RoamingDetails", columns)
 	if err != nil {
@@ -216,38 +221,54 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
 		// Delete the previous Instance 
 		
 		
-		
-		
-		var columns []shim.Column
+		var columns1 []shim.Column
 		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
 		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
-		columns = append(columns, col1)
-		columns = append(columns, col2)
+		columns1 = append(columns1, col1)
+		columns1 = append(columns1, col2)
+		err = stub.DeleteRow("RoamingDetails",columns1)
+		fmt.Println("Table row deletion Error Occured (if any)",err)
+		
+		if err!=nil {
+		return nil,fmt.Errorf("insertTable operation failed. %s", err)
+		}
 		
 		
 		
+		//Insert
 		
+		var columns []*shim.Column
 		
-		err = stub.DeleteRow("RoamingDetails",columns)
-		
-		// Insert Data to Internal RocksDB
-		
-		ok, errNew := stub.InsertRow("RoamingDetails", shim.Row{
-		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
-			&shim.Column{Value: &shim.Column_String_{String_: args[1]}},
-			&shim.Column{Value: &shim.Column_String_{String_: CallDuration}},
-			&shim.Column{Value: &shim.Column_String_{String_: CallCost}},
-			&shim.Column{Value: &shim.Column_String_{String_: DataDuration}},
-			&shim.Column{Value: &shim.Column_String_{String_: DataCost}},
-			&shim.Column{Value: &shim.Column_String_{String_: Status1}},
-			},
-	    })
+		col1 = shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+		col2 = shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+		col3 := shim.Column{Value: &shim.Column_String_{String_: CallDuration}}
+		col4 := shim.Column{Value: &shim.Column_String_{String_: CallCost}}
+		col5 := shim.Column{Value: &shim.Column_String_{String_: DataDuration}}
+		col6 := shim.Column{Value: &shim.Column_String_{String_: DataCost}}
+		col7 := shim.Column{Value: &shim.Column_String_{String_: Status1}}
+		columns = append(columns, &col1)
+		columns = append(columns, &col2)
+		columns = append(columns, &col3)
+		columns = append(columns, &col4)
+		columns = append(columns, &col5)
+		columns = append(columns, &col6)
+		columns = append(columns, &col7)
 
-		if !ok && errNew == nil {
-		return nil, errors.New("Insertion Failed")
+		row := shim.Row{Columns: columns}
+		ok, errNew := stub.InsertRow("RoamingDetails", row)
+		
+		
+		if errNew != nil {
+			return nil, fmt.Errorf("insertTable operation failed. %s", err)
+		}
+		if !ok {
+			return nil, errors.New("insertTable operation failed. Row with given key already exists")
 		}
 
+		
+		fmt.Println("Error After Insertion (if any)",errNew)
+		
+		
 		
             CDRobj := CDR{Number: args[0], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
 			res2F, _ := json.Marshal(CDRobj)
@@ -366,7 +387,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		  
 		  
 		
-		// Insert Data to Internal RocksDB
+		/*// Insert Data to Internal RocksDB
 		
 		ok, errNew := stub.InsertRow("RoamingDetails", shim.Row{
 		Columns: []*shim.Column{
@@ -378,18 +399,42 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 			&shim.Column{Value: &shim.Column_String_{String_: DataCost}},
 			&shim.Column{Value: &shim.Column_String_{String_: Status1}},
 			},
-	    })
+	    })*/
+		
+		
+		var columns []*shim.Column
+		
+		
+		
+		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+		col3 := shim.Column{Value: &shim.Column_String_{String_: CallDuration}}
+		col4 := shim.Column{Value: &shim.Column_String_{String_: CallCost}}
+		col5 := shim.Column{Value: &shim.Column_String_{String_: DataDuration}}
+		col6 := shim.Column{Value: &shim.Column_String_{String_: DataCost}}
+		col7 := shim.Column{Value: &shim.Column_String_{String_: Status1}}
+		columns = append(columns, &col1)
+		columns = append(columns, &col2)
+		columns = append(columns, &col3)
+		columns = append(columns, &col4)
+		columns = append(columns, &col5)
+		columns = append(columns, &col6)
+		columns = append(columns, &col7)
 
-		 if !ok && errNew == nil {
-		return nil, errors.New("Insertion Failed")
+		row := shim.Row{Columns: columns}
+		ok, errNew := stub.InsertRow("RoamingDetails", row)
+		
+		
+		if errNew != nil {
+			return nil, fmt.Errorf("insertTable operation failed. %s", err)
+		}
+		if !ok {
+			return nil, errors.New("insertTable operation failed. Row with given key already exists")
 		}
 		
-		 if !ok {
-		return nil, errors.New("Insertion Failed (not OK )")
-		}
 		
 		
-		fmt.Println("Error Structure after insertion",errNew)
+		fmt.Println("Error Structure after insertion (if any)",errNew)
 		 
 		 // Update World State
 		
