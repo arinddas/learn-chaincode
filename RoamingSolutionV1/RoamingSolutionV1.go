@@ -148,6 +148,8 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
 	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
 	columns = append(columns, col1)
 	columns = append(columns, col2)
+	
+	 fmt.Println("columns of query",columns);
 
 	row, err := stub.GetRow("RoamingDetails", columns)
 	if err != nil {
@@ -381,6 +383,13 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		 if !ok && errNew == nil {
 		return nil, errors.New("Insertion Failed")
 		}
+		
+		 if !ok {
+		return nil, errors.New("Insertion Failed (not OK )")
+		}
+		
+		
+		fmt.Println("Error Structure after insertion",errNew)
 		 
 		 // Update World State
 		
