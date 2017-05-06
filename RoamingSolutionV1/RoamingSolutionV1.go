@@ -34,6 +34,7 @@ type RoamingSolutionChaincode struct {
 type CDR struct {
 
 		Number string `json:"Number"`
+		TimeStamp string `json:"TimeStamp"`
 		CallDuration string `json:"CallDuration"`
 		CallCost string `json:"CallCost"`
 	    DataDuration string `json:"DataDuration"`
@@ -41,9 +42,12 @@ type CDR struct {
 		Status string `json:"Status"`
 }
 
+
+
 type Subscriber struct {
 
 		Number string `json:"Number"`
+		TimeStamp string `json:"TimeStamp"`
 		CallDuration string `json:"CallDuration"`
 	    DataDuration string `json:"DataDuration"`
 		Status string `json:"Status"`
@@ -64,13 +68,114 @@ func (t *RoamingSolutionChaincode) Init(stub shim.ChaincodeStubInterface, functi
 	if len(args) != 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 0")
 	}
+	
+	// Create Subscriber Details table
+	err := stub.CreateTable("RoamingDetails", []*shim.ColumnDefinition{
+		&shim.ColumnDefinition{Name: "Number", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "TimeStamp", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "CallDuration", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "CallCost", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "DataDuration", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "DataCost", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "Status", Type: shim.ColumnDefinition_STRING, Key: false},
+	})
+	
+	if err != nil {
+		return nil, errors.New("Failed creating RoamingDetails table.")
+	}
 
 	fmt.Println("Init Chaincode...done")
 
 	return nil, nil
 }
 
+// EntitlementFromHPMN Query function
 
+func (t *RoamingSolutionChaincode) EntitlementFromHPMNQuery(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+
+    fmt.Println("EntitlementFromHPMN Query Begins...")
+
+    //update the row with new ServiceProvider
+	 
+	var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+	columns = append(columns, col1)
+	columns = append(columns, col2)
+
+	row, err := stub.GetRow("RoamingDetails", columns)
+	if err != nil {
+		fmt.Println("Failed retriving details of %s: %s", string(args[0]), err)
+		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+	}
+	
+    if len(row.Columns) != 0{
+		
+			CallDuration := row.Columns[3].GetString_()
+			CallCost := row.Columns[4].GetString_()
+			DataDuration := row.Columns[5].GetString_()
+			DataCost := row.Columns[6].GetString_()
+			Status1 := row.Columns[7].GetString_()
+		
+		
+            CDRobj := CDR{Number: args[0], TimeStamp: args[1], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
+			res2F, _ := json.Marshal(CDRobj)
+		    fmt.Println(string(res2F))
+	
+			fmt.Println("EntitlementFromHPMN Query ends...")
+			return res2F, nil
+		
+   
+     }
+	 
+	 return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+
+}
+
+
+// EntitlementFromVPMN Query function
+
+func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+
+    fmt.Println("EntitlementFromVPMN Query Begins...")
+
+    //update the row with new ServiceProvider
+	 
+	var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+	columns = append(columns, col1)
+	columns = append(columns, col2)
+
+	row, err := stub.GetRow("RoamingDetails", columns)
+	if err != nil {
+		fmt.Println("Failed retriving details of %s: %s", string(args[0]), err)
+		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+	}
+	
+    if len(row.Columns) != 0{
+		
+			CallDuration := row.Columns[3].GetString_()
+			CallCost := row.Columns[4].GetString_()
+			DataDuration := row.Columns[5].GetString_()
+			DataCost := row.Columns[6].GetString_()
+			Status1 := row.Columns[7].GetString_()
+		
+		
+            CDRobj := CDR{Number: args[0], TimeStamp: args[1], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
+			res2F, _ := json.Marshal(CDRobj)
+		    fmt.Println(string(res2F))
+	
+			fmt.Println("EntitlementFromVPMN Query ends...")
+			return res2F, nil
+		
+   
+     }
+	 return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+
+}
 
 // EntitlementFromHPMN Invoke function
 
@@ -79,11 +184,11 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
     fmt.Println("EntitlementFromHPMN invoke Begins...")
 
 
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 1")
+	if len(args) != 2 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 2")
 	}
 	
-	    var err error
+	    var err error 
 		
 		Status1 := "CDRApprovedByHPMN"
 		key := args[0]
@@ -105,6 +210,43 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
 		DataDuration := res.DataDuration
 		DataCost := res.DataCost
 		
+		
+		// Delete the previous Instance 
+		
+		
+		
+		
+		var columns []shim.Column
+		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+		columns = append(columns, col1)
+		columns = append(columns, col2)
+		
+		
+		
+		
+		
+		err = stub.DeleteRow("RoamingDetails",columns)
+		
+		// Insert Data to Internal RocksDB
+		
+		ok, errNew := stub.InsertRow("RoamingDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[1]}},
+			&shim.Column{Value: &shim.Column_String_{String_: CallDuration}},
+			&shim.Column{Value: &shim.Column_String_{String_: CallCost}},
+			&shim.Column{Value: &shim.Column_String_{String_: DataDuration}},
+			&shim.Column{Value: &shim.Column_String_{String_: DataCost}},
+			&shim.Column{Value: &shim.Column_String_{String_: Status1}},
+			},
+	    })
+
+		if !ok && errNew == nil {
+		return nil, errors.New("Insertion Failed")
+		}
+
+		
             CDRobj := CDR{Number: args[0], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
 			res2F, _ := json.Marshal(CDRobj)
 		    fmt.Println(string(res2F))
@@ -124,8 +266,8 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
 
 func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
       
-        if len(args) != 3 {
-		return nil, errors.New("Incorrect number of arguments. Expecting 3")
+        if len(args) != 4 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	    }
 		
 		 var CallDurationint,CallCostint,DataDurationint,DataCostint int
@@ -135,7 +277,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		key := args[0]
 		
 		
-		Subscriberobj := Subscriber{Number: args[0], CallDuration: args[1], DataDuration: args[2], Status: Status1}
+		Subscriberobj := Subscriber{Number: args[0], TimeStamp: args[1], CallDuration: args[2], DataDuration: args[3], Status: Status1}
 	    res2F, _ := json.Marshal(Subscriberobj)
         fmt.Println(string(res2F))
 	    err := stub.PutState(key,[]byte(string(res2F)))
@@ -176,6 +318,14 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 			
 		// Calculate cost details for VPMN Service
 		
+		if DataDurationint <= 0 {
+		   DataCostint = 0
+		}
+		
+		if CallDurationint <= 0 {
+		   CallCostint = 0
+		}
+		
 		if CallDurationint >= 1 && CallDurationint <= 300{
 		   CallCostint = CallDurationint * 2;
 		}
@@ -208,11 +358,33 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
          DataDuration := strconv.Itoa(DataDurationint)
 		 
 		 
-		 // Put the state of CDR
+		// Put the state of CDR
 		 
           Status1 = "CDRApprovalPending"
+		  
+		  
 		
-            CDRobj := CDR{Number: args[0], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
+		// Insert Data to Internal RocksDB
+		
+		ok, errNew := stub.InsertRow("RoamingDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
+			&shim.Column{Value: &shim.Column_String_{String_: args[1]}},
+			&shim.Column{Value: &shim.Column_String_{String_: CallDuration}},
+			&shim.Column{Value: &shim.Column_String_{String_: CallCost}},
+			&shim.Column{Value: &shim.Column_String_{String_: DataDuration}},
+			&shim.Column{Value: &shim.Column_String_{String_: DataCost}},
+			&shim.Column{Value: &shim.Column_String_{String_: Status1}},
+			},
+	    })
+
+		 if !ok && errNew == nil {
+		return nil, errors.New("Insertion Failed")
+		}
+		 
+		 // Update World State
+		
+            CDRobj := CDR{Number: args[0], TimeStamp: args[1], CallDuration: CallDuration, CallCost: CallCost, DataDuration: DataDuration, DataCost: DataCost, Status: Status1}
 			res2F, _ = json.Marshal(CDRobj)
 		    fmt.Println(string(res2F))
 		    err = stub.PutState(key,[]byte(string(res2F)))
@@ -226,7 +398,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		fmt.Println("CDR Details Structure",CDRobj)
 			
 			
-		fmt.Println("Invoke EntitlementFromHPMN Chaincode... end") 
+		fmt.Println("Invoke EntitlementFromVPMN Chaincode... end") 
 		return nil,nil
 	
 	
@@ -263,6 +435,14 @@ func (t *RoamingSolutionChaincode) Invoke(stub shim.ChaincodeStubInterface, func
 
 func (t *RoamingSolutionChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Println("Query RoamingSolution Chaincode... start") 
+	
+	
+	if function == "EntitlementFromVPMNQuery" {
+		return t.EntitlementFromVPMNQuery(stub, args)
+	} 
+	if function == "EntitlementFromHPMNQuery" {
+		return t.EntitlementFromHPMNQuery(stub, args)
+	} 
 
 	key := args[0]
 
