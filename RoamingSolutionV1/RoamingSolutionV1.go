@@ -71,7 +71,8 @@ func (t *RoamingSolutionChaincode) Init(stub shim.ChaincodeStubInterface, functi
 	
 	// Create Subscriber Details table
 	err := stub.CreateTable("RoamingDetails", []*shim.ColumnDefinition{
-		&shim.ColumnDefinition{Name: "Number", Type: shim.ColumnDefinition_STRING, Key: true},
+	    &shim.ColumnDefinition{Name: "KeyCol", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "Number", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "TimeStamp", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "CallDuration", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "CallCost", Type: shim.ColumnDefinition_STRING, Key: false},
@@ -97,12 +98,12 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMNQuery(stub shim.ChaincodeS
     fmt.Println("EntitlementFromHPMN Query Begins...")
 
     //update the row with new ServiceProvider
+	
+	key:= args[0]+args[1];
 	 
 	var columns []shim.Column
-	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
-	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+	col1 := shim.Column{Value: &shim.Column_String_{String_: key}}
 	columns = append(columns, col1)
-	columns = append(columns, col2)
 
 	row, err := stub.GetRow("RoamingDetails", columns)
 	if err != nil {
@@ -141,20 +142,13 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
 
     fmt.Println("EntitlementFromVPMN Query Begins...")
 
-    //update the row with new ServiceProvider
+     //update the row with new ServiceProvider
+	
+	key:= args[0]+args[1];
 	 
 	var columns []shim.Column
-	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
-	col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
-	
-	fmt.Println("col1",col1)
-	fmt.Println("col2",col2)
-	
+	col1 := shim.Column{Value: &shim.Column_String_{String_: key}}
 	columns = append(columns, col1)
-	columns = append(columns, col2)
-	
-	
-	 fmt.Println("columns of query",columns)
 
 	row, err := stub.GetRow("RoamingDetails", columns)
 	if err != nil {
@@ -180,6 +174,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
 		
    
      }
+	 
 	 return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
 
 }
@@ -217,15 +212,14 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
 		DataDuration := res.DataDuration
 		DataCost := res.DataCost
 		
+		CompositeKey := args[0]+args[1]
 		
 		// Delete the previous Instance 
 		
 		
 		var columns1 []shim.Column
-		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
-		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+		col1 := shim.Column{Value: &shim.Column_String_{String_: CompositeKey}}
 		columns1 = append(columns1, col1)
-		columns1 = append(columns1, col2)
 		err = stub.DeleteRow("RoamingDetails",columns1)
 		fmt.Println("Table row deletion Error Occured (if any)",err)
 		
@@ -239,13 +233,16 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMN(stub shim.ChaincodeStubIn
 		
 		var columns []*shim.Column
 		
+		
+		colkey := shim.Column{Value: &shim.Column_String_{String_: CompositeKey}}
 		col1 = shim.Column{Value: &shim.Column_String_{String_: args[0]}}
-		col2 = shim.Column{Value: &shim.Column_String_{String_: args[1]}}
+		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
 		col3 := shim.Column{Value: &shim.Column_String_{String_: CallDuration}}
 		col4 := shim.Column{Value: &shim.Column_String_{String_: CallCost}}
 		col5 := shim.Column{Value: &shim.Column_String_{String_: DataDuration}}
 		col6 := shim.Column{Value: &shim.Column_String_{String_: DataCost}}
 		col7 := shim.Column{Value: &shim.Column_String_{String_: Status1}}
+		columns = append(columns, &colkey)
 		columns = append(columns, &col1)
 		columns = append(columns, &col2)
 		columns = append(columns, &col3)
@@ -402,10 +399,12 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 	    })*/
 		
 		
+		//Insert
+		
 		var columns []*shim.Column
+		CompositeKey := args[0]+args[1]
 		
-		
-		
+		colkey := shim.Column{Value: &shim.Column_String_{String_: CompositeKey}}
 		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
 		col2 := shim.Column{Value: &shim.Column_String_{String_: args[1]}}
 		col3 := shim.Column{Value: &shim.Column_String_{String_: CallDuration}}
@@ -413,6 +412,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		col5 := shim.Column{Value: &shim.Column_String_{String_: DataDuration}}
 		col6 := shim.Column{Value: &shim.Column_String_{String_: DataCost}}
 		col7 := shim.Column{Value: &shim.Column_String_{String_: Status1}}
+		columns = append(columns, &colkey)
 		columns = append(columns, &col1)
 		columns = append(columns, &col2)
 		columns = append(columns, &col3)
@@ -431,7 +431,6 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMN(stub shim.ChaincodeStubIn
 		if !ok {
 			return nil, errors.New("insertTable operation failed. Row with given key already exists")
 		}
-		
 		
 		
 		fmt.Println("Error Structure after insertion (if any)",errNew)
