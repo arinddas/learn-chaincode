@@ -101,6 +101,8 @@ func (t *RoamingSolutionChaincode) EntitlementFromHPMNQuery(stub shim.ChaincodeS
 	
 	key:= args[0]+args[1];
 	 
+	 fmt.Println("key in query",key)
+	 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: key}}
 	columns = append(columns, col1)
@@ -145,12 +147,16 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
      //update the row with new ServiceProvider
 	
 	key:= args[0]+args[1];
+	
+	fmt.Println("key in query",key)
 	 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: key}}
 	columns = append(columns, col1)
 
 	row, err := stub.GetRow("RoamingDetails", columns)
+	
+	fmt.Println("row returned : ",row)
 	if err != nil {
 		fmt.Println("Failed retriving details of %s: %s", string(args[0]), err)
 		return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
@@ -175,7 +181,7 @@ func (t *RoamingSolutionChaincode) EntitlementFromVPMNQuery(stub shim.ChaincodeS
    
      }
 	 
-	 return nil, fmt.Errorf("Failed retriving details of %s: %s", string(args[0]), err)
+	 return nil, fmt.Errorf("Failed retriving details at last of %s: %s", string(args[0]), err)
 
 }
 
