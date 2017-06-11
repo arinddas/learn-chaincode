@@ -557,7 +557,7 @@ func (t *RetailTradingChaincode) RetailTradingStatus(stub shim.ChaincodeStubInte
 				
 				
 				LoyaltyPoints1_int = LoyaltyPoints1_int - Customer1Points + Customer2Points
-				LoyaltyPoints2_int = LoyaltyPoints2_int - Customer1Points + Customer1Points
+				LoyaltyPoints2_int = LoyaltyPoints2_int - Customer2Points + Customer1Points
 				
 				LoyaltyPoints1_str := strconv.Itoa(LoyaltyPoints1_int)
 				LoyaltyPoints2_str := strconv.Itoa(LoyaltyPoints2_int)
