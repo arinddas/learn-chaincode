@@ -461,8 +461,6 @@ func (t *RetailTradingChaincode) RetailTradingStatus(stub shim.ChaincodeStubInte
 			&shim.Column{Value: &shim.Column_String_{String_: args[5]}},
 			&shim.Column{Value: &shim.Column_String_{String_: args[6]}},
 			&shim.Column{Value: &shim.Column_String_{String_: args[7]}},
-			&shim.Column{Value: &shim.Column_String_{String_: args[8]}},
-			&shim.Column{Value: &shim.Column_String_{String_: args[9]}},
 	      },
 		  })
 	  if errNew != nil {
