@@ -693,7 +693,7 @@ func (t *RetailTradingChaincode) GetALLTradingDetailsQuery(stub shim.ChaincodeSt
 			Retailer2 := row.Columns[5].GetString_()
 			LoyaltyPoints2 := row.Columns[6].GetString_()
 			Status := row.Columns[7].GetString_()
-			TimeStamp := row.Columns[7].GetString_()
+			TimeStamp := row.Columns[8].GetString_()
 			
 		
 		
