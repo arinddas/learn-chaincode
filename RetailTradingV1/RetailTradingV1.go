@@ -252,7 +252,7 @@ func (t *RetailTradingChaincode) LSToSSQuery(stub shim.ChaincodeStubInterface, a
 		col2 := shim.Column{Value: &shim.Column_String_{String_: key}}
 		columns2 = append(columns2, col2)
 		
-		row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns)
+		row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns2)
 		if err1 != nil {
 			fmt.Println("Failed retriving details of %s: %s", string(key), err1)
 			return nil, fmt.Errorf("Failed retriving details of %s: %s", string(key), err1)
@@ -359,7 +359,7 @@ func (t *RetailTradingChaincode) SSToLSQuery(stub shim.ChaincodeStubInterface, a
 		col2 := shim.Column{Value: &shim.Column_String_{String_: key}}
 		columns2 = append(columns2, col2)
 		
-		row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns)
+		row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns2)
 		if err1 != nil {
 			fmt.Println("Failed retriving details of %s: %s", string(key), err1)
 			return nil, fmt.Errorf("Failed retriving details of %s: %s", string(key), err1)
@@ -507,7 +507,7 @@ func (t *RetailTradingChaincode) RetailTradingStatus(stub shim.ChaincodeStubInte
 					col2 := shim.Column{Value: &shim.Column_String_{String_: key}}
 					columns2 = append(columns2, col2)
 					
-					row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns)
+					row1, err1 := stub.GetRow("RetailLoyaltyPointDetails", columns2)
 					if err1 != nil {
 						fmt.Println("Failed retriving details of %s: %s", string(key), err1)
 						return nil, fmt.Errorf("Failed retriving details of %s: %s", string(key), err1)
