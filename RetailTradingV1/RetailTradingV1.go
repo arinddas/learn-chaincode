@@ -149,7 +149,7 @@ func (t *RetailTradingChaincode) Update(stub shim.ChaincodeStubInterface, args [
     if len(row.Columns) != 0{
 		
 		// Customer1 := args[0]
-		// Retailer1 := row.Columns[1].GetString_()
+		Retailer1 := row.Columns[1].GetString_()
 		LoyaltyPoints1 := row.Columns[2].GetString_()
 		
 		
@@ -187,7 +187,7 @@ func (t *RetailTradingChaincode) Update(stub shim.ChaincodeStubInterface, args [
 		ok, err := stub.ReplaceRow("RetailLoyaltyPointDetails", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: args[0]}},
-			&shim.Column{Value: &shim.Column_String_{String_: args[1]}},
+			&shim.Column{Value: &shim.Column_String_{String_: Retailer1}},
 			&shim.Column{Value: &shim.Column_String_{String_: LoyaltyPoints1}},
 	      },
 		  })
